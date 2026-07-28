@@ -64,7 +64,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /opt/iranlivan/frontend
+            cd /opt/livancups/frontend
             GIT_SSH_COMMAND="ssh -i ~/.ssh/id_ed25519_frontend" git pull origin main
-            cd /opt/iranlivan
+            cd /opt/livancups
             docker compose up -d --build frontend
