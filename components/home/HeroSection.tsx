@@ -6,10 +6,10 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 
 const metrics = [
-  { value: "۱۰ هزار+", label: "لیوان روزانه" },
-  { value: "۴۸ ساعت", label: "میانگین تولید" },
-  { value: "۱۰۰٪", label: "گواهی ایمنی غذایی" },
-  { value: "۵۰۰+", label: "برند مشتری" },
+  { value: "10 هزار+", label: "لیوان روزانه" },
+  { value: "72 ساعت", label: "میانگین تولید" },
+  { value: "100٪", label: "گواهی ایمنی غذایی" },
+  { value: "500+", label: "برند مشتری" },
 ];
 
 export default function HeroSection() {
