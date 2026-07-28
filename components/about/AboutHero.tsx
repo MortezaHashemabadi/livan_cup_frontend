@@ -54,7 +54,7 @@ export default function AboutHero() {
             className="relative aspect-[4/3] rounded-[40px] overflow-hidden bg-cream"
           >
             <Image
-              src="/cup_1.jpeg"
+              src="/about/chatgpt_about_hero.png"
               alt="خط تولید کاپ‌کرافت"
               fill
               className="object-cover"

@@ -8,45 +8,40 @@ import { Button } from "@/components/ui/button";
 const designs = [
   {
     id: 1,
-    name: "اسکاندیناوی مینیمال",
-    image:
-      "https://media.db.com/images/public/6a37a714a93b14f8cbd64720/df9782f62_generated_ae760354.png",
+    name: "دودل ایلوستریشن",
+    image: "/ai-design-doodle.png",
     color: "bg-soft-blue/20",
   },
   {
     id: 2,
-    name: "باغ گیاهی",
-    image:
-      "https://media.db.com/images/public/6a37a714a93b14f8cbd64720/8825e30b7_generated_d6d3c25a.png",
+    name: "تایپوگرافی",
+    image: "/ai-design-typography.png",
     color: "bg-pale-mint/30",
   },
   {
     id: 3,
-    name: "نسخه لوکس",
-    image:
-      "https://media.db.com/images/public/6a37a714a93b14f8cbd64720/98e1fafbd_generated_4cff30a3.png",
-    color: "bg-soft-peach/20",
+    name: "کاراکترهای دوست‌داشتنی",
+    image: "/ai-design-characters.png",
+    color: "bg-cream",
   },
   {
     id: 4,
-    name: "ذن ژاپنی",
-    image:
-      "https://media.db.com/images/public/6a37a714a93b14f8cbd64720/30c1cec38_generated_c8cfc160.png",
+    name: "وینتیج",
+    image: "/ai-design-vintage.png",
     color: "bg-soft-blue/20",
   },
   {
     id: 5,
     name: "هنر انتزاعی",
-    image:
-      "https://media.db.com/images/public/6a37a714a93b14f8cbd64720/485eade45_generated_c7f34772.png",
+    image: "/ai-design-abstract.png",
     color: "bg-soft-peach/20",
   },
+
   {
     id: 6,
-    name: "قهوه‌خانه قدیمی",
-    image:
-      "https://media.db.com/images/public/6a37a714a93b14f8cbd64720/072b53e63_generated_e4ada157.png",
-    color: "bg-cream",
+    name: "بوهو مینیمال",
+    image: "/ai-design-boho.png",
+    color: "bg-soft-peach/20",
   },
 ];
 
@@ -117,12 +112,12 @@ export default function AIShowcase() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.4 }}
-                  className={`absolute inset-0 rounded-[40px] ${designs[active].color} p-8 flex items-center justify-center`}
+                  className={`absolute inset-0 rounded-[40px] ${designs[active].color} flex items-center justify-center`}
                 >
                   <img
                     src={designs[active].image}
                     alt={designs[active].name}
-                    className="w-full h-full object-contain drop-shadow-xl"
+                    className="w-full h-full object-contain drop-shadow-xl rounded-[40px]"
                   />
                 </motion.div>
               </AnimatePresence>

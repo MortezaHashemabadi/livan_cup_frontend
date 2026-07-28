@@ -48,24 +48,23 @@ jobs:
           NEXT_PUBLIC_API_BASE_URL: http://localhost/api
           NEXT_PUBLIC_MEDIA_URL: http://localhost
         run: npm run build
-
-  # build-and-deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-  #
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Deploy to server
-  #       uses: appleboy/ssh-action@v1.0.3
-  #       with:
-  #         host: ${{ secrets.SERVER_HOST }}
-  #         username: ${{ secrets.SERVER_USER }}
-  #         key: ${{ secrets.SERVER_SSH_KEY }}
-  #         script: |
-  #           cd /opt/iranlivan/frontend
-  #           git pull origin main
-  #           cd /opt/iranlivan
-  #           docker compose up -d --build frontend
+  build-and-deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+  
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /opt/iranlivan/frontend
+            GIT_SSH_COMMAND="ssh -i ~/.ssh/id_ed25519_frontend" git pull origin main
+            cd /opt/iranlivan
+            docker compose up -d --build frontend

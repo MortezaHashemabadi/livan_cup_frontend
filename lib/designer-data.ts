@@ -13,7 +13,6 @@ export const attributePromptMap: Record<
     کرافت: { fa: "جنس کرافت قهوه‌ای", en: "kraft brown material" },
     براق: { fa: "جنس براق", en: "glossy surface material" },
     مات: { fa: "جنس مات", en: "matte surface material" },
-    بازیافتی: { fa: "جنس بازیافتی", en: "recycled eco-friendly material" },
   },
   surface: {
     صاف: { fa: "سطح صاف", en: "smooth outer surface" },
@@ -22,54 +21,106 @@ export const attributePromptMap: Record<
   },
 };
 
+
+
 export const stylePresets = [
   {
-    id: "minimal_cafe",
-    name: "کافه مینیمال",
-    image:
-      "https://media.db.com/images/public/6a37a714a93b14f8cbd64720/df9782f62_generated_ae760354.png",
-    fa: "سبک کافه مینیمال",
-    en: "minimalist cafe style, warm earthy tones, modern typography",
+    id: "doodle_illustration",
+    name: "دودل ایلوستریشن",
+    image: "/ai-design-doodle.png",
+    fa: "دودل ایلوستریشن",
+    en: "playful hand-drawn doodle illustration, whimsical sketchy line characters and objects, black ink on cream background, quirky zine-style composition",
   },
   {
-    id: "modern_geometric",
-    name: "هندسی مدرن",
-    image:
-      "https://media.db.com/images/public/6a37a714a93b14f8cbd64720/8825e30b7_generated_d6d3c25a.png",
-    fa: "سبک هندسی مدرن",
-    en: "modern geometric patterns, pastel colors, abstract contemporary style",
+    id: "typography",
+    name: "تایپوگرافی",
+    image: "/ai-design-typography.png",
+    fa: "سبک تایپوگرافی",
+    en: "bold modern typography design, clean sans-serif lettering as the central pattern, geometric grid layout, high-contrast color blocking",
   },
   {
-    id: "vintage_coffee",
-    name: "رترو",
-    image:
-      "https://media.db.com/images/public/6a37a714a93b14f8cbd64720/072b53e63_generated_e4ada157.png",
-    fa: "سبک رترو",
-    en: "vintage coffee shop branding, retro typography, warm brown tones",
+    id: "character",
+    name: "کاراکتر",
+    image: "/ai-design-characters.png",
+    fa: "سبک کاراکتری",
+    en: "cute character-driven illustration, whimsical mascot figures with expressive faces, flat vibrant colors, friendly rounded shapes",
   },
   {
-    id: "luxury_gold",
-    name: "لوکس طلایی",
-    image:
-      "https://media.db.com/images/public/6a37a714a93b14f8cbd64720/98e1fafbd_generated_4cff30a3.png",
-    fa: "سبک لوکس طلایی",
-    en: "premium luxury design, gold foil details, dark navy background",
+    id: "vintage",
+    name: "وینتیج",
+    image: "/ai-design-vintage.png",
+    fa: "سبک وینتیج",
+    en: "vintage retro design, aged paper texture with warm sepia tones, classic serif lettering, nostalgic old-world ornamental details",
   },
   {
-    id: "japanese_minimal",
-    name: "ژاپنی",
-    image:
-      "https://media.db.com/images/public/6a37a714a93b14f8cbd64720/30c1cec38_generated_c8cfc160.png",
-    fa: "سبک ژاپنی مینیمال",
-    en: "Japanese wabi-sabi style, cherry blossom, soft natural colors",
+    id: "abstract_art",
+    name: "هنر انتزاعی",
+    image: "/ai-design-abstract.png",
+    fa: "سبک هنر انتزاعی",
+    en: "abstract fine-art style, expressive brushstrokes and organic shapes, bold color-block composition, gallery-quality contemporary feel",
   },
   {
-    id: "botanical",
-    name: "گیاهی",
-    image:
-      "https://media.db.com/images/public/6a37a714a93b14f8cbd64720/485eade45_generated_c7f34772.png",
-    fa: "سبک گیاهی",
-    en: "hand-painted botanical illustration, leaves and flowers, soft green tones",
+    id: "boho_minimal",
+    name: "بوهو مینیمال",
+    image: "/ai-design-boho.png",
+    fa: "سبک بوهو مینیمال",
+    en: "boho minimal style, muted earthy color palette, delicate fine linework, relaxed organic layout with airy negative space",
+  },
+  {
+    id: "line_art_illustration",
+    name: "خط‌نگاره",
+    image: "/ai-design-lineart.png",
+    fa: "سبک خط‌نگاره ایلوستریتیو",
+    en: "intricate black line art illustration, dense surreal character composition, fine continuous linework on cream background, zine-style hand-drawn aesthetic",
+  },
+  {
+    id: "risograph",
+    name: "ریسوگراف",
+    image: "/ai-design-risograph.png",
+    fa: "سبک چاپ ریسوگراف",
+    en: "riso print style, limited color layers with visible offset misregistration, grainy halftone texture, bold flat shapes",
+  },
+  {
+    id: "art_deco",
+    name: "آرت دکو",
+    image: "/ai-design-artdeco.png",
+    fa: "سبک آرت دکو لوکس",
+    en: "art deco design, symmetrical geometric linework, gold and black palette, elegant 1920s luxury motifs",
+  },
+  {
+    id: "scandinavian_folk",
+    name: "فولک اسکاندیناوی",
+    image: "/ai-design-scandi.png",
+    fa: "سبک فولک اسکاندیناوی",
+    en: "scandinavian folk art style, stylized birds and botanical shapes, muted earthy color palette, flat decorative pattern",
+  },
+  {
+    id: "memphis_pattern",
+    name: "ممفیس",
+    image: "/ai-design-memphis.png",
+    fa: "سبک پترن ممفیس",
+    en: "memphis design pattern, playful geometric shapes in bold colors, squiggles and confetti dots on neutral background, postmodern 80s energy",
+  },
+  {
+    id: "watercolor_botanical",
+    name: "آبرنگ گیاهی",
+    image: "/ai-design-watercolor.png",
+    fa: "سبک آبرنگ گیاهی",
+    en: "soft watercolor botanical painting, natural pigment bleed, delicate leaves and florals, handmade premium feel",
+  },
+  {
+    id: "ukiyo_e_wave",
+    name: "اوکیو-اِ",
+    image: "/ai-design-ukiyoe.png",
+    fa: "سبک اوکیو-اِ ژاپنی",
+    en: "traditional Japanese ukiyo-e woodblock print style, stylized waves and clouds, limited indigo and cream palette, fine outline work",
+  },
+  {
+    id: "brutalist_type",
+    name: "برو‌تالیست",
+    image: "/ai-design-brutalist.png",
+    fa: "سبک تایپوگرافی برو‌تالیست",
+    en: "brutalist typography design, oversized cropped letterforms, stark black and white contrast, raw modern grid layout",
   },
 ];
 

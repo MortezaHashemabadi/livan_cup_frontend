@@ -2,9 +2,9 @@
 import { motion } from "framer-motion";
 
 const stats = [
-  { value: "۵۰۰+", label: "برند خدمت‌گرفته" },
+  { value: "۵۰۰+", label: "رستوران و کافی شاپ" },
   { value: "۲ میلیون+", label: "لیوان تولیدشده" },
-  { value: "۵۰+", label: "کشور" },
+  { value: "۵۰+", label: "شهر" },
   { value: "۹۹٪", label: "رضایت مشتریان" },
 ];
 
@@ -18,13 +18,13 @@ export default function SocialProof() {
           viewport={{ once: true }}
           className="text-center text-sm font-medium text-muted-foreground/60 tracking-widest uppercase mb-12"
         >
-          مورد اعتماد کافه‌ها، رستوران‌ها و برندهای سراسر جهان
+          مورد اعتماد کافه‌ها، رستوران‌ها و برندهای سراسر ایران
         </motion.p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, i) => (
             <motion.div
-              key={stat.label}
+              key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

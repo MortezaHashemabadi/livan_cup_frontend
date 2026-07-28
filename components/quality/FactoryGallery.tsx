@@ -14,29 +14,29 @@ interface GalleryImage {
 const images: GalleryImage[] = [
   {
     label: "کارخانه",
-    url: "",
+    url: "/quality/images.jpg",
     className: "row-span-2",
   },
   {
     label: "ماشین‌آلات",
-    url: "",
+    url: "/quality/ChatGPT_mashine.png",
   },
   {
     label: "خط تولید",
-    url: "",
+    url: "/quality/ChatGPT_product_line.png",
   },
   {
     label: "بازرسی کیفیت",
-    url: "",
+    url: "/quality/Gemini_Generated_Image_s90pzus90pzus90p.png",
   },
   {
     label: "بسته‌بندی",
-    url: "",
+    url: "/quality/Gemini_Generated_Image_tcoslgtcoslgtcos.png",
     className: "row-span-2",
   },
   {
     label: "انبار",
-    url: "",
+    url: "/quality/Gemini_Generated_Image_7z1kwx7z1kwx7z1k.png",
     className: "col-span-2",
   },
 ];

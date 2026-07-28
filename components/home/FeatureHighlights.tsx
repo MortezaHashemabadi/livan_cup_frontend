@@ -15,7 +15,7 @@ const features = [
     color: "bg-soft-peach",
     iconColor: "text-orange-500",
     heading: "تحویل سریع",
-    description: "از طرح تأیید شده تا در خانه شما، در کمتر از ۷ روز کاری.",
+    description: "از طرح تأیید شده تا در خانه شما، در کمتر از 30 روز کاری.",
   },
   {
     icon: Leaf,

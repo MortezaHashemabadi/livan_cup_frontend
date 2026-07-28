@@ -15,7 +15,7 @@ export default function BrandStory() {
             className="aspect-[4/3] rounded-[40px] overflow-hidden bg-soft-blue/20 order-2 lg:order-1 relative"
           >
             <Image
-              src=""
+              src="/about/Paper-Cup-Making-Machine-Price-Sri-Lanka.avif"
               alt="داستان برند کاپ‌کرافت"
               fill
               className="object-cover"

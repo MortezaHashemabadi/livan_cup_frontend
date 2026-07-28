@@ -26,7 +26,7 @@ export default function HeroSection() {
       <div className="absolute top-0 left-0 w-[700px] h-[700px] rounded-full bg-soft-peach/25 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-pale-mint/20 blur-[100px] pointer-events-none" />
 
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-8 w-full pt-32 pb-20">
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-8 w-full pt-20 pb-20">
         <div className="grid lg:grid-cols-2 gap-12 xl:gap-20 items-center">
           <motion.div
             initial={{ opacity: 0, y: 36 }}
@@ -96,7 +96,7 @@ export default function HeroSection() {
           >
             <div className="relative rounded-[40px] overflow-hidden bg-gradient-to-bl from-soft-peach/60 via-cream to-soft-blue/30 shadow-[0_32px_80px_-12px_rgba(0,0,0,0.12)] aspect-square flex items-center justify-center">
               <Image
-                src="/cup_1.jpeg"
+                src="/hero_image_new.png"
                 alt="لیوان کاغذی سفارشی"
                 width={600}
                 height={600}
