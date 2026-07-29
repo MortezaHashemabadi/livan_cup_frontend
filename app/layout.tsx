@@ -11,8 +11,11 @@ import CartDrawer from "@/components/cart/CartDrawer";
 import AuthModal from "@/components/auth/AuthModal";
 
 export const metadata: Metadata = {
-  title: "ایران لیوان",
+  title: "لیوان کاپس",
   description: "فروش آنلاین لیوان کاغذی و پلاستیکی",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({

@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   ShoppingBag,
   Menu,
@@ -85,13 +86,18 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-2xl bg-foreground flex items-center justify-center transition-transform group-hover:scale-105">
-                <span className="text-background font-heading font-extrabold text-sm">
-                  C
-                </span>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden">
+                <Image
+                  src="/logo.png"
+                  alt="لیوان کاغذی سفارشی"
+                  width={40}
+                  height={40}
+                  className="w-full h-full object-contain"
+                  priority
+                />
               </div>
               <span className="font-heading font-bold text-xl tracking-tight block">
-                ایران لیوان
+                لیوان کاپس
               </span>
             </Link>
 

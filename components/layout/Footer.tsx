@@ -68,7 +68,7 @@ const socialLinks = [
         </g>
       </svg>
     ),
-    href: "#",
+    href: "#dd",
   },
   {
     icon: (
@@ -102,7 +102,7 @@ const socialLinks = [
         </g>
       </svg>
     ),
-    href: "#",
+    href: "https://www.instagram.com/livancups.ir/",
   },
   {
     icon: (
@@ -130,7 +130,7 @@ const socialLinks = [
         </g>
       </svg>
     ),
-    href: "#",
+    href: "#rr",
   },
 ];
 
@@ -149,7 +149,7 @@ export default function Footer() {
               </div>
 
               <span className="font-heading font-bold text-xl text-background tracking-tight">
-                ایران لیوان
+                لیوان کاپس
               </span>
             </div>
 
@@ -216,6 +216,8 @@ export default function Footer() {
                 <Link
                   key={index}
                   href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-10 h-10 rounded-xl  flex items-center justify-center  transition-all duration-300"
                 >
                   {icon}
