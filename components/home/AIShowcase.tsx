@@ -119,6 +119,12 @@ export default function AIShowcase() {
                     alt={designs[active].name}
                     className="w-full h-full object-contain drop-shadow-xl rounded-[40px]"
                   />
+                  <div className="absolute top-7 left-7 flex items-center gap-2 bg-white/90 backdrop-blur-md rounded-full px-4 py-2.5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.10)] border border-white">
+                    <Sparkles className="w-3.5 h-3.5 text-cobalt" />
+                    <span className="text-xs font-semibold text-foreground">
+                      {designs[active].name}
+                    </span>
+                  </div>
                 </motion.div>
               </AnimatePresence>
             </div>

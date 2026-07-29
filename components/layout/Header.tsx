@@ -90,7 +90,7 @@ export default function Header() {
                   C
                 </span>
               </div>
-              <span className="font-heading font-bold text-xl tracking-tight hidden sm:block">
+              <span className="font-heading font-bold text-xl tracking-tight block">
                 ایران لیوان
               </span>
             </Link>
