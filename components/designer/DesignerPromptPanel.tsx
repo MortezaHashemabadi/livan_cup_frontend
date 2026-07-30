@@ -80,50 +80,57 @@ export default function DesignerPromptPanel({
 
   return (
     <div className="flex flex-col gap-6 w-full min-w-0">
-      <div className="bg-white rounded-3xl p-6 border border-border/50 flex flex-col w-full min-w-0 overflow-hidden">
+      <div className="bg-white rounded-3xl p-6 border border-border/50 flex flex-col w-full max-w-full min-w-0 overflow-hidden">
         <label className="text-sm font-medium mb-4 block">سبک‌های آماده</label>
-        <Carousel
-          dir="ltr"
-          className="w-full"
-          opts={{ containScroll: "keepSnaps" }}
-        >
-          <CarouselContent className="-ml-2 py-2">
-            {stylePresets.map((preset) => (
-              <CarouselItem
-                key={preset.id}
-                className="basis-1/2 pl-2 lg:basis-1/3"
-              >
-                <button
-                  onClick={() => onPreset(preset)}
-                  className={`relative w-full rounded-2xl overflow-hidden group transition-all duration-200 ${
-                    selectedPreset === preset.id
-                      ? "ring-2 ring-cobalt"
-                      : "ring-1 ring-border/40 hover:ring-cobalt/40"
-                  }`}
+
+        {/* این wrapper اضافی باعث قفل شدن کامل عرض می‌شود */}
+        <div className="w-full max-w-full min-w-0 overflow-hidden">
+          <Carousel
+            dir="ltr"
+            className="w-full max-w-full min-w-0"
+            opts={{ containScroll: "keepSnaps", direction: "ltr" }}
+          >
+            <CarouselContent className="-ms-2 py-2">
+              {stylePresets.map((preset) => (
+                <CarouselItem
+                  key={preset.id}
+                  /* min-w-0 و shrink-0 مانع از کش آمدن آیتم‌ها می‌شوند */
+                  className="basis-1/2 ps-2 lg:basis-1/3 min-w-0 shrink-0 grow-0"
                 >
-                  <div className="aspect-square">
-                    <img
-                      src={preset.image}
-                      alt={preset.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-2.5">
-                    <p className="text-background text-xs font-semibold">
-                      {preset.name}
-                    </p>
-                  </div>
-                  {selectedPreset === preset.id && (
-                    <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-cobalt flex items-center justify-center">
-                      <Check className="w-3.5 h-3.5 text-white" />
+                  <button
+                    type="button"
+                    onClick={() => onPreset(preset)}
+                    className={`relative w-full rounded-2xl overflow-hidden group transition-all duration-200 ${
+                      selectedPreset === preset.id
+                        ? "ring-2 ring-cobalt"
+                        : "ring-1 ring-border/40 hover:ring-cobalt/40"
+                    }`}
+                  >
+                    {/* bg-slate-100 یا bg-muted مانع از Layout Shift قبل از لود عکس می‌شود */}
+                    <div className="aspect-square w-full relative overflow-hidden bg-slate-100">
+                      <img
+                        src={preset.image}
+                        alt={preset.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
                     </div>
-                  )}
-                </button>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
+                    <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-transparent to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-2.5">
+                      <p className="text-background text-xs font-semibold truncate">
+                        {preset.name}
+                      </p>
+                    </div>
+                    {selectedPreset === preset.id && (
+                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-cobalt flex items-center justify-center">
+                        <Check className="w-3.5 h-3.5 text-white" />
+                      </div>
+                    )}
+                  </button>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        </div>
       </div>
 
       <div className="bg-white rounded-3xl p-6 border border-border/50">
