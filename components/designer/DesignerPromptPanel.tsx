@@ -80,7 +80,7 @@ export default function DesignerPromptPanel({
 
   return (
     <div className="flex flex-col gap-6 w-full min-w-0">
-      {/* <div className="bg-white rounded-3xl p-6 border border-border/50 flex flex-col w-full max-w-full min-w-0 overflow-hidden">
+      <div className="bg-white rounded-3xl p-6 border border-border/50 flex flex-col w-full max-w-full min-w-0 overflow-hidden">
         <label className="text-sm font-medium mb-4 block">سبک‌های آماده</label>
 
         <div className="w-full max-w-full min-w-0 overflow-hidden">
@@ -128,7 +128,7 @@ export default function DesignerPromptPanel({
             </CarouselContent>
           </Carousel>
         </div>
-      </div> */}
+      </div>
 
       <div className="bg-white rounded-3xl p-6 border border-border/50">
         <p className="text-sm font-medium mb-3">پالت رنگی</p>

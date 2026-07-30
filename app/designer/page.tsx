@@ -254,14 +254,14 @@ export default function DesignerPage() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 xl:gap-16 items-start">
-          <div className="w-full lg:sticky lg:top-28">
+          <div className="w-full lg:sticky lg:top-28 min-w-0">
             <DesignerCanvas
               generatedImage={generatedImage}
               isGenerating={generateAiMutation.isPending}
             />
           </div>
 
-          <div className="flex flex-col gap-7">
+          <div className="flex flex-col gap-7 min-w-0">
             {/* انتخاب محصول */}
             <div className="bg-secondary/40 rounded-3xl p-6">
               <p className="text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider mb-3">
