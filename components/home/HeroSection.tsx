@@ -86,18 +86,17 @@ export default function HeroSection() {
               >
                 <div className="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full bg-soft-blue/50 border border-cobalt/10 text-cobalt text-xs font-semibold tracking-wide mb-8">
                   <Sparkles className="w-3.5 h-3.5" />
-                  طراحی لیوان با هوش مصنوعی
+                  لیوان اختصاصی برای کافه و رستوران
                 </div>
     
                 <h1 className="font-display font-extrabold text-[clamp(2.2rem,5.5vw,4.2rem)] leading-[1.2] tracking-tight text-foreground mb-6">
                   لیوان سفارشی،
                   <br />
-                  <span className="text-cobalt">طراحی شده با هوش مصنوعی.</span>
+                  <span className="text-cobalt">اختصاصی برای برند شما.</span>
                 </h1>
     
                 <p className="text-lg text-muted-foreground leading-relaxed max-w-md mb-10">
-                  در چند دقیقه لیوان برند خود را بسازید. با هوش مصنوعی طرح، رنگ و
-                  گرافیک تولید کنید — سپس سفارش آماده برای چاپ بدهید.
+                  از انتخاب طرح و رنگ تا تولید؛ لیوان‌های کاغذی برندتان را با طراحی اختصاصی سفارش دهید.
                 </p>
     
                 <div className="flex items-center gap-4 mb-12">
