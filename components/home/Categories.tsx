@@ -14,7 +14,7 @@ const colorCycle = [
 
 export default function Categories() {
   const { data: categories = [], isLoading } = useCategories();
-  const mainCategories = categories.filter((c) => !c.is_accessory);
+  const mainCategories = categories.filter((c) => c.parent !== null);
 
   if (!isLoading && mainCategories.length === 0) return null;
 

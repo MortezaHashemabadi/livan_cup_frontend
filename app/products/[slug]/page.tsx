@@ -251,8 +251,6 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              
-
               {isGenerating && (
                 <motion.div
                   initial={{ opacity: 0 }}

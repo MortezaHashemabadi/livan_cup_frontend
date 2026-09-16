@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart-context";
 import {
   getVariantImage,
+  getVariantHoverImage,
   isNewVariant,
   type VariantListItem,
 } from "@/lib/api/endpoints/catalog";
@@ -17,6 +18,7 @@ export default function ProductCard({ item }: { item: VariantListItem }) {
   const { product, variant } = item;
   const { addItem } = useCart();
   const image = getVariantImage(variant);
+  const hoverImage = getVariantHoverImage(variant);
   const startingPrice = variant.price_tiers.length
     ? Math.min(...variant.price_tiers.map((t) => parseFloat(t.unit_price)))
     : null;
@@ -47,11 +49,24 @@ export default function ProductCard({ item }: { item: VariantListItem }) {
       >
         <div className="rounded-3xl bg-cream overflow-hidden mb-4 aspect-square relative">
           {image ? (
-            <img
-              src={`${NEXT_PUBLIC_MEDIA_URL}${image}`}
-              alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
+            <>
+              <img
+                src={`${NEXT_PUBLIC_MEDIA_URL}${image}`}
+                alt={product.name}
+                className={`w-full h-full object-cover transition-opacity duration-500 ${
+                  hoverImage
+                    ? "group-hover:opacity-0"
+                    : "transition-transform group-hover:scale-105"
+                }`}
+              />
+              {hoverImage && (
+                <img
+                  src={`${NEXT_PUBLIC_MEDIA_URL}${hoverImage}`}
+                  alt={product.name}
+                  className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                />
+              )}
+            </>
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <ShoppingBag className="w-12 h-12 text-muted-foreground/20" />

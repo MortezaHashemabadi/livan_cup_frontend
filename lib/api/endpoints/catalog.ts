@@ -65,6 +65,21 @@ export interface Category {
   image: string | null;
 }
 
+export interface TopSellingVariant {
+  id: number;
+  sku: string;
+  images: ProductImage[];
+  attribute_values: AttributeValue[];
+  stock_status: StockStatus;
+  available_from: string | null;
+  price_tiers: PriceTier[];
+  related_variants?: RelatedVariant[];
+  created_at: string;
+  is_designable: boolean;
+  product_name: string;
+  product_slug: string;
+}
+
 export function getVariantImage(variant: Variant): string | null {
   const primary = variant.images.find((i) => i.is_primary) || variant.images[0];
   return primary ? primary.image : null;
@@ -77,6 +92,8 @@ export const catalogApi = {
       `/catalog/products/${categorySlug ? `?category=${categorySlug}` : ""}`,
     ),
   product: (slug: string) => api.get<Product>(`/catalog/products/${slug}/`),
+  topSellingVariants: () =>
+    api.get<TopSellingVariant[]>("/catalog/variants/top-selling/"),
 };
 
 export function getPrimaryImage(product: Product): string | null {
@@ -207,4 +224,41 @@ export function getRelatedVariantStartingPrice(
 ): number | null {
   const prices = variant.price_tiers.map((t) => parseFloat(t.unit_price));
   return prices.length ? Math.min(...prices) : null;
+}
+
+export function getVariantHoverImage(variant: Variant): string | null {
+  const primary = variant.images.find((i) => i.is_primary) || variant.images[0];
+  const sorted = [...variant.images].sort((a, b) => a.order - b.order);
+  const secondary = sorted.find((i) => i !== primary);
+  return secondary ? secondary.image : null;
+}
+
+export function topSellingToVariantItems(
+  items: TopSellingVariant[],
+): VariantListItem[] {
+  return items.map((v) => ({
+    product: {
+      id: v.id,
+      name: v.product_name,
+      slug: v.product_slug,
+      description: "",
+      category: "",
+      category_slug: "",
+      images: [],
+      variants: [],
+      is_designable: v.is_designable,
+    },
+    variant: {
+      id: v.id,
+      sku: v.sku,
+      images: v.images,
+      attribute_values: v.attribute_values,
+      stock_status: v.stock_status,
+      available_from: v.available_from,
+      price_tiers: v.price_tiers,
+      related_variants: v.related_variants ?? [],
+      created_at: v.created_at,
+      is_designable: v.is_designable,
+    },
+  }));
 }

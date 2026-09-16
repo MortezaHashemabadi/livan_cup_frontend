@@ -18,3 +18,10 @@ export function useProduct(slug: string) {
     enabled: !!slug,
   });
 }
+
+export function useTopSellingVariants() {
+  return useQuery({
+    queryKey: ["variants", "top-selling"],
+    queryFn: catalogApi.topSellingVariants,
+  });
+}

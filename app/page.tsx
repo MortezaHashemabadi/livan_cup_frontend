@@ -9,11 +9,13 @@ import FAQSection from "@/components/home/FAQSection";
 import CTASection from "@/components/home/CTASection";
 import Testimonials from "@/components/home/Testimonials";
 import QualityHighlights from "@/components/home/QualityHighlights";
+import BestSellers from "@/components/home/BestSellers";
 
 export default function HomePage() {
   return (
     <div>
       <HeroSection />
+      <BestSellers />
       <SocialProof />
       <FeatureHighlights />
       <AIShowcase />
