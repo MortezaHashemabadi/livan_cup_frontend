@@ -20,11 +20,11 @@ type Feature = {
 
 const features: Feature[] = [
   {
-    icon: Layers,
+    icon: ShieldCheck,
     color: "bg-soft-blue",
     iconColor: "text-cobalt",
-    title: "تولید بدون چسب",
-    desc: "ساختار یکپارچه و ایمن، بدون استفاده از چسب‌های شیمیایی مضر.",
+    title: "اتصال اولتراسونیک، بدون چسب",
+    desc: "لیوان‌ها بدون استفاده از چسب تولید می‌شوند؛ اتصال اولتراسونیک برای استفاده مطمئن‌ در کنار نوشیدنی‌های گرم.",
   },
   {
     icon: PackageCheck,
@@ -42,24 +42,24 @@ const features: Feature[] = [
   },
   {
     icon: Printer,
-    color: "bg-cream",
-    iconColor: "text-amber-600",
-    title: "چاپ باکیفیت",
-    desc: "چاپ دقیق و ماندگار با رنگ‌های زنده روی سطح لیوان.",
-  },
-  {
-    icon: Cog,
-    color: "bg-secondary",
-    iconColor: "text-cobalt",
-    title: "تولید خودکار",
-    desc: "خطوط تولید اتوماتیک برای دقت، سرعت و یکنواختی بالاتر.",
+    color: "bg-soft-peach",
+    iconColor: "text-orange-500",
+    title: "چاپی که برندتان را درست نشان می‌دهد",
+    desc: "اجرای دقیق طرح و رنگ برای اینکه لوگو و هویت بصری برند شما روی محصول تمیز و حرفه‌ای دیده شود.",
   },
   {
     icon: Leaf,
     color: "bg-soft-blue",
     iconColor: "text-emerald-600",
-    title: "محصولات دوستدار محیط زیست",
-    desc: "قابل بازیافت و سازگار با محیط زیست، برای آینده‌ای پایدار.",
+    title: "تمرکز روی نیاز کسب‌وکار",
+    desc: "محصول را صرفاً برای تولید نمی‌کنیم؛ هدف این است که انتخاب نهایی با نوع استفاده، سبک برند و نیاز واقعی کسب‌وکار شما هماهنگ باشد.",
+  },
+  {
+    icon: PackageCheck,
+    color: "bg-cream",
+    iconColor: "text-amber-600",
+    title: "یک مجموعه برای برند شما",
+    desc: "لیوان بیرون‌بر و بگ پارچه‌ای را می‌توانید با یک هویت بصری یکپارچه سفارش دهید و تجربه برندتان را هماهنگ کنید.",
   },
 ];
 
@@ -74,7 +74,7 @@ export default function WhyChooseUs() {
           className="text-center mb-16"
         >
           <span className="inline-block text-xs font-semibold tracking-widest uppercase text-cobalt mb-4">
-            چرا کاپ‌کرافت؟
+            چرا لیوان کاپس؟
           </span>
 
           <h2 className="font-display font-extrabold text-3xl md:text-4xl lg:text-5xl tracking-tight">

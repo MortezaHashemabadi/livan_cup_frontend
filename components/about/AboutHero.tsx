@@ -17,18 +17,19 @@ export default function AboutHero() {
             animate={{ opacity: 1, y: 0 }}
           >
             <span className="inline-block text-xs font-semibold tracking-widest uppercase text-cobalt mb-4">
-              درباره کاپ‌کرافت
+              درباره لیوان کاپس
             </span>
 
             <h1 className="font-display font-extrabold text-4xl md:text-5xl lg:text-6xl tracking-tight mb-6 leading-[1.2]">
-              تولیدی که با
+              محصولاتی برای
               <br />
-              <span className="text-cobalt">اعتماد شما</span> رشد کرده
+              <span className="text-cobalt">دیده‌شدن برند شما</span>
             </h1>
 
             <p className="text-xl text-muted-foreground leading-relaxed max-w-lg mb-4">
-              کاپ‌کرافت تولیدکننده لیوان‌های کاغذی و پلاستیکی سفارشی است که
-              کیفیت صنعتی را با طراحی هوشمند ترکیب می‌کند.
+              لیوان کاپس با تمرکز بر تولید محصولات سفارشی برای کسب‌وکارها شکل
+              گرفته؛ از لیوان‌های بیرون‌بر تا بگ‌های پارچه‌ای، با طراحی متناسب
+              با هویت هر برند.
             </p>
 
             <p className="text-base text-muted-foreground leading-relaxed max-w-lg mb-10">

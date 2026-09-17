@@ -25,7 +25,7 @@ export default function DesignGallery() {
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cobalt/10 text-cobalt text-sm font-medium mb-4">
               <Sparkles className="w-4 h-4" />
-              ساخته شده با ایران لیوان
+              ساخته شده با بگ کاپ
             </div>
             <h2 className="font-display font-extrabold text-4xl md:text-5xl tracking-tight">
               طرح‌های واقعی،

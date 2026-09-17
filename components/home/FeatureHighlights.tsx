@@ -7,22 +7,25 @@ const features = [
     icon: Sparkles,
     color: "bg-soft-blue",
     iconColor: "text-cobalt",
-    heading: "طراحی با هوش مصنوعی",
-    description: "در چند ثانیه با یک متن ساده، گرافیک آماده چاپ تولید کنید.",
+    heading: "طراحی اختصاصی برند شما",
+    description:
+      "طرح اختصاصی خودتان را برای لیوان و بگ اجرا کنید و محصولی هماهنگ با هویت برندتان داشته باشید.",
   },
   {
     icon: Zap,
     color: "bg-soft-peach",
     iconColor: "text-orange-500",
-    heading: "تحویل سریع",
-    description: "از طرح تأیید شده تا در خانه شما، در کمتر از 30 روز کاری.",
+    heading: "تولید و تحویل سریع",
+    description:
+      "سفارش شما پس از تأیید طرح وارد فرآیند تولید می‌شود و در کوتاه‌ترین زمان آماده تحویل خواهد بود.",
   },
   {
     icon: Leaf,
     color: "bg-pale-mint",
     iconColor: "text-emerald-600",
-    heading: "مواد زیست‌محیطی",
-    description: "گواهی FSC، قابل کمپوست و چاپ با جوهر آبی — برای زمین بهتر.",
+    heading: "متریال باکیفیت",
+    description:
+      "استفاده از متریال مناسب و باکیفیت برای ارائه محصولی حرفه‌ای و ماندگار.",
   },
   {
     icon: ShieldCheck,
@@ -30,7 +33,7 @@ const features = [
     iconColor: "text-cobalt",
     heading: "کیفیت تضمینی",
     description:
-      "هر دسته پیش از ارسال بررسی می‌شود — وگرنه رایگان چاپ مجدد می‌کنیم.",
+      "سفارش‌ها پیش از ارسال بررسی می‌شوند تا محصول نهایی با کیفیت مورد انتظار شما به دستتان برسد.",
   },
 ];
 
@@ -46,7 +49,7 @@ export default function FeatureHighlights() {
           className="text-center mb-14"
         >
           <span className="inline-block text-xs font-semibold tracking-widest uppercase text-cobalt mb-4">
-            چرا ایران لیوان؟
+            چرا بگ کاپ؟
           </span>
           <h2 className="font-display font-extrabold text-3xl md:text-4xl lg:text-5xl tracking-tight">
             ساخته شده برای برندهای مدرن

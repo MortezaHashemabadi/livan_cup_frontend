@@ -18,8 +18,8 @@ export default function HomePage() {
       <BestSellers />
       <SocialProof />
       <FeatureHighlights />
-      <AIShowcase />
       <Categories />
+      <AIShowcase />
       <QualityHighlights />
       <DesignGallery />
       <HowItWorks />

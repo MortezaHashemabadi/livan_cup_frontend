@@ -18,13 +18,13 @@ export default function CTASection() {
           <div className="absolute bottom-0 left-1/4 w-[200px] h-[200px] rounded-full bg-soft-peach/10 blur-3xl" />
           <div className="relative">
             <h2 className="font-display font-extrabold text-4xl md:text-5xl text-background tracking-tight mb-6">
-              آماده طراحی
+              برند شما،
               <br />
-              لیوان ایده‌آل خود هستید؟
+              روی محصول شما
             </h2>
             <p className="text-background/50 text-lg max-w-md mx-auto mb-10">
-              به صدها برندی بپیوندید که با هوش مصنوعی طرح‌های منحصربه‌فرد و
-              آماده تولید می‌سازند.
+              لیوان و بگ پارچه‌ای اختصاصی، با طراحی هماهنگ با هویت برند شما؛ از
+              ایده تا تولید، کنار شما هستیم.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/designer">

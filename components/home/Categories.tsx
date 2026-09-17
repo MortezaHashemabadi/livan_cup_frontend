@@ -31,7 +31,7 @@ export default function Categories() {
             دسته‌بندی محصولات
           </h2>
           <p className="text-lg text-muted-foreground max-w-md mx-auto">
-            همه چیزی که برای کسب‌وکار نوشیدنی‌تان نیاز دارید
+            همه چیزی که برای کسب‌وکار نیاز دارید
           </p>
         </motion.div>
 

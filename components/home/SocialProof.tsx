@@ -2,10 +2,10 @@
 import { motion } from "framer-motion";
 
 const stats = [
-  { value: "۵۰۰+", label: "رستوران و کافی شاپ" },
-  { value: "۲ میلیون+", label: "لیوان تولیدشده" },
+  { value: "۵۰۰+", label: "کسب‌وکار و برند" },
+  { value: "۲۰ میلیون+", label: "محصول تولیدشده" },
   { value: "۵۰+", label: "شهر" },
-  { value: "۹۹٪", label: "رضایت مشتریان" },
+  { value: "۹۵٪", label: "رضایت مشتریان" },
 ];
 
 export default function SocialProof() {
@@ -16,7 +16,7 @@ export default function SocialProof() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="text-center text-sm font-medium text-muted-foreground/60 tracking-widest uppercase mb-12"
+          className="text-center text-md font-medium text-muted-foreground/60 tracking-widest uppercase mb-12"
         >
           مورد اعتماد کافه‌ها، رستوران‌ها و برندهای سراسر ایران
         </motion.p>

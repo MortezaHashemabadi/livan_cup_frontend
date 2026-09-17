@@ -1,32 +1,24 @@
+"use client";
+
 import Link from "next/link";
-import {
-  Phone,
-  MessageCircle,
-  Mail,
-  MapPin,
-  Clock,
-  Send,
-} from "lucide-react";
+import { useRef } from "react";
+import { Phone, MessageCircle, Mail, MapPin, Clock, Send } from "lucide-react";
+import FooterWave from "./FooterWave";
 
 const footerLinks = {
   محصولات: [
+    { label: "بگ پارچه ای", path: "/products?category=fabric_bags" },
     { label: "لیوان کاغذی", path: "/products?category=paper_cups" },
     { label: "لیوان پلاستیکی", path: "/products?category=plastic_cups" },
     { label: "درپوش", path: "/products?category=lids" },
     { label: "نگه‌دارنده لیوان", path: "/products?category=cup_holders" },
   ],
-
-  // شرکت: [
-  //   { label: "درباره ما", path: "/about" },
-  //   { label: "تعرفه", path: "/pricing" },
-  //   { label: "تماس با ما", path: "/about" },
-  // ],
 };
 
 const contactInfo = [
-  { icon: Phone, text: "۰۲۱-۱۲۳۴۵۶۷۸" },
-  { icon: MessageCircle, text: "۰۹۱۲۳۴۵۶۷۸۹" },
-  { icon: Mail, text: "info@cupcraft.ir" },
+  { icon: Phone, text: "09309156835" },
+  { icon: MessageCircle, text: "09309156835" },
+  { icon: Mail, text: "info@bagcup.ir" },
   {
     icon: MapPin,
     text: "تهران، شهرک صنعتی، خیابان تولید، پلاک ۱۲",
@@ -38,38 +30,38 @@ const contactInfo = [
 ];
 
 const socialLinks = [
-  {
-    icon: (
-      <svg
-        width="102px"
-        height="102px"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-        <g
-          id="SVGRepo_tracerCarrier"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        ></g>
-        <g id="SVGRepo_iconCarrier">
-          {" "}
-          <path
-            d="M2 22L3.41152 16.8691C2.54422 15.3639 2.08876 13.6568 2.09099 11.9196C2.08095 6.44549 6.52644 2 11.99 2C14.6417 2 17.1315 3.02806 19.0062 4.9034C19.9303 5.82266 20.6627 6.91616 21.1611 8.12054C21.6595 9.32492 21.9139 10.6162 21.9096 11.9196C21.9096 17.3832 17.4641 21.8287 12 21.8287C10.3368 21.8287 8.71374 21.4151 7.26204 20.6192L2 22ZM7.49424 18.8349L7.79675 19.0162C9.06649 19.7676 10.5146 20.1644 11.99 20.1654C16.5264 20.1654 20.2263 16.4662 20.2263 11.9291C20.2263 9.73176 19.3696 7.65554 17.8168 6.1034C17.0533 5.33553 16.1453 4.72636 15.1453 4.31101C14.1452 3.89565 13.0728 3.68232 11.99 3.68331C7.44343 3.6839 3.74476 7.38316 3.74476 11.9202C3.74476 13.4724 4.17843 14.995 5.00502 16.3055L5.19645 16.618L4.35982 19.662L7.49483 18.8354L7.49424 18.8349Z"
-            fill="#FFF8F0"
-          ></path>{" "}
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M9.52024 7.76662C9.33885 7.35303 9.13737 7.34298 8.96603 7.34298C8.81477 7.33294 8.65288 7.33294 8.48154 7.33294C8.32083 7.33294 8.04845 7.39321 7.81684 7.64549C7.58464 7.89719 6.95007 8.49217 6.95007 9.71167C6.95007 10.9318 7.83693 12.1111 7.95805 12.2724C8.07858 12.4337 9.67149 15.0139 12.192 16.0124C14.2883 16.839 14.712 16.6777 15.1657 16.6269C15.6189 16.5767 16.6275 16.0325 16.839 15.4476C17.0405 14.8733 17.0405 14.3693 16.9802 14.2682C16.9199 14.1678 16.748 14.1069 16.5064 13.9758C16.2541 13.8552 15.0446 13.2502 14.813 13.1693C14.5808 13.0889 14.4195 13.0487 14.2582 13.2904C14.0969 13.5427 13.623 14.0969 13.4724 14.2582C13.3306 14.4195 13.1799 14.4396 12.9377 14.3185C12.686 14.1979 11.8895 13.9356 10.9418 13.0889C10.2056 12.4331 9.71167 11.6171 9.56041 11.3755C9.41979 11.1232 9.54032 10.992 9.67149 10.8709C9.78257 10.7604 9.92378 10.579 10.0449 10.4378C10.1654 10.296 10.2056 10.1855 10.2966 10.0242C10.377 9.86292 10.3368 9.71167 10.2765 9.59114C10.2157 9.48006 9.74239 8.25997 9.52024 7.76603V7.76662Z"
-            fill="#FFF8F0"
-          ></path>{" "}
-        </g>
-      </svg>
-    ),
-    href: "#dd",
-  },
+  // {
+  //   icon: (
+  //     <svg
+  //       width="102px"
+  //       height="102px"
+  //       viewBox="0 0 24 24"
+  //       fill="none"
+  //       xmlns="http://www.w3.org/2000/svg"
+  //     >
+  //       <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+  //       <g
+  //         id="SVGRepo_tracerCarrier"
+  //         strokeLinecap="round"
+  //         strokeLinejoin="round"
+  //       ></g>
+  //       <g id="SVGRepo_iconCarrier">
+  //         {" "}
+  //         <path
+  //           d="M2 22L3.41152 16.8691C2.54422 15.3639 2.08876 13.6568 2.09099 11.9196C2.08095 6.44549 6.52644 2 11.99 2C14.6417 2 17.1315 3.02806 19.0062 4.9034C19.9303 5.82266 20.6627 6.91616 21.1611 8.12054C21.6595 9.32492 21.9139 10.6162 21.9096 11.9196C21.9096 17.3832 17.4641 21.8287 12 21.8287C10.3368 21.8287 8.71374 21.4151 7.26204 20.6192L2 22ZM7.49424 18.8349L7.79675 19.0162C9.06649 19.7676 10.5146 20.1644 11.99 20.1654C16.5264 20.1654 20.2263 16.4662 20.2263 11.9291C20.2263 9.73176 19.3696 7.65554 17.8168 6.1034C17.0533 5.33553 16.1453 4.72636 15.1453 4.31101C14.1452 3.89565 13.0728 3.68232 11.99 3.68331C7.44343 3.6839 3.74476 7.38316 3.74476 11.9202C3.74476 13.4724 4.17843 14.995 5.00502 16.3055L5.19645 16.618L4.35982 19.662L7.49483 18.8354L7.49424 18.8349Z"
+  //           fill="#FFF8F0"
+  //         ></path>{" "}
+  //         <path
+  //           fillRule="evenodd"
+  //           clipRule="evenodd"
+  //           d="M9.52024 7.76662C9.33885 7.35303 9.13737 7.34298 8.96603 7.34298C8.81477 7.33294 8.65288 7.33294 8.48154 7.33294C8.32083 7.33294 8.04845 7.39321 7.81684 7.64549C7.58464 7.89719 6.95007 8.49217 6.95007 9.71167C6.95007 10.9318 7.83693 12.1111 7.95805 12.2724C8.07858 12.4337 9.67149 15.0139 12.192 16.0124C14.2883 16.839 14.712 16.6777 15.1657 16.6269C15.6189 16.5767 16.6275 16.0325 16.839 15.4476C17.0405 14.8733 17.0405 14.3693 16.9802 14.2682C16.9199 14.1678 16.748 14.1069 16.5064 13.9758C16.2541 13.8552 15.0446 13.2502 14.813 13.1693C14.5808 13.0889 14.4195 13.0487 14.2582 13.2904C14.0969 13.5427 13.623 14.0969 13.4724 14.2582C13.3306 14.4195 13.1799 14.4396 12.9377 14.3185C12.686 14.1979 11.8895 13.9356 10.9418 13.0889C10.2056 12.4331 9.71167 11.6171 9.56041 11.3755C9.41979 11.1232 9.54032 10.992 9.67149 10.8709C9.78257 10.7604 9.92378 10.579 10.0449 10.4378C10.1654 10.296 10.2056 10.1855 10.2966 10.0242C10.377 9.86292 10.3368 9.71167 10.2765 9.59114C10.2157 9.48006 9.74239 8.25997 9.52024 7.76603V7.76662Z"
+  //           fill="#FFF8F0"
+  //         ></path>{" "}
+  //       </g>
+  //     </svg>
+  //   ),
+  //   href: "#dd",
+  // },
   {
     icon: (
       <svg
@@ -102,7 +94,7 @@ const socialLinks = [
         </g>
       </svg>
     ),
-    href: "https://www.instagram.com/livancups.ir/",
+    href: "https://www.instagram.com/bagcup.ir/",
   },
   {
     icon: (
@@ -130,14 +122,22 @@ const socialLinks = [
         </g>
       </svg>
     ),
-    href: "#rr",
+    href: "https://t.me/Morteza_HAY",
   },
 ];
 
+
 export default function Footer() {
+  const footerRef = useRef(null);
+
   return (
-    <footer className="bg-foreground text-background/70">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
+    <footer
+      ref={footerRef}
+      className="bg-foreground text-background/70 relative "
+    >
+      <FooterWave triggerRef={footerRef} />
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* برند */}
           <div>
@@ -149,13 +149,13 @@ export default function Footer() {
               </div>
 
               <span className="font-heading font-bold text-xl text-background tracking-tight">
-                لیوان کاپس
+                بگ کاپ
               </span>
             </div>
 
             <p className="text-sm leading-relaxed text-background/50 max-w-xs">
-              لیوان‌های سفارشی با کیفیت برتر، طراحی شده با هوش مصنوعی. تلاقی
-              تولید ممتاز و خلاقیت نوین.
+              تولید محصولات اختصاصی برای برندها؛ از لیوان‌های بیرون‌بر تا بگ‌های
+              پارچه‌ای، با تمرکز بر کیفیت و طراحی حرفه‌ای.
             </p>
           </div>
 
@@ -224,18 +224,12 @@ export default function Footer() {
                 </Link>
               ))}
             </div>
-
-            {/* <div className="border-t border-background/10 pt-8">
-              <div className="w-28 h-28 rounded-xl border-2 border-dashed border-background/20 flex items-center justify-center text-xs text-background/30">
-                لوگوی اینماد
-              </div>
-            </div> */}
           </div>
         </div>
 
         <div className="border-t border-background/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-background/30">
-            &copy; {new Date().getFullYear()} ایران لیوان. تمامی حقوق محفوظ است.
+            &copy; {new Date().getFullYear()} بگ کاپ. تمامی حقوق محفوظ است.
           </p>
 
           <div className="flex gap-6">
