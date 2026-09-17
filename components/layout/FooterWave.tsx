@@ -10,8 +10,12 @@ gsap.registerPlugin(ScrollTrigger, MorphSVGPlugin);
 const DOWN = "M0-0.3C0-0.3,464,156,1139,156S2278-0.3,2278-0.3V200H0V-0.3z";
 const CENTER = "M0-0.3C0-0.3,464,0,1139,0s1139-0.3,1139-0.3V200H0V-0.3z";
 
-export default function FooterWave({ triggerRef }) {
-  const pathRef = useRef(null);
+interface FooterWaveProps {
+  triggerRef: React.RefObject<HTMLElement | null>;
+}
+
+export default function FooterWave({ triggerRef }: FooterWaveProps) {
+  const pathRef = useRef<SVGPathElement | null>(null);
 
   useEffect(() => {
     const trigger = triggerRef?.current;
