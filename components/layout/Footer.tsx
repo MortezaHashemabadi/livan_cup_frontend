@@ -6,12 +6,11 @@ import { Phone, MessageCircle, Mail, MapPin, Clock, Send } from "lucide-react";
 import FooterWave from "./FooterWave";
 
 const footerLinks = {
-  محصولات: [
-    { label: "بگ پارچه ای", path: "/products?category=fabric_bags" },
-    { label: "لیوان کاغذی", path: "/products?category=paper_cups" },
-    { label: "لیوان پلاستیکی", path: "/products?category=plastic_cups" },
-    { label: "درپوش", path: "/products?category=lids" },
-    { label: "نگه‌دارنده لیوان", path: "/products?category=cup_holders" },
+  " لینک ها": [
+    { label: "محصولات", path: "/products" },
+    { label: "نمونه ها", path: "/gallery" },
+    { label: "کیفیت تولید", path: "/quality" },
+    { label: "درباره ما", path: "/about" },
   ],
 };
 
@@ -138,7 +137,7 @@ export default function Footer() {
       <FooterWave triggerRef={footerRef} />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20 relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* برند */}
           <div>
             <div className="flex items-center gap-2.5 mb-6">
@@ -158,7 +157,27 @@ export default function Footer() {
               پارچه‌ای، با تمرکز بر کیفیت و طراحی حرفه‌ای.
             </p>
           </div>
+          {/* اطلاعات تماس */}
+          <div>
+            <h4 className="font-heading font-semibold text-background text-sm mb-5">
+              اطلاعات تماس
+            </h4>
 
+            <ul className="space-y-4">
+              {contactInfo.map(({ icon: Icon, text }) => (
+                <li
+                  key={text}
+                  className="flex items-start gap-3 text-sm text-background/50"
+                >
+                  <Icon
+                    size={17}
+                    className="mt-0.5 shrink-0 text-background/70"
+                  />
+                  <span>{text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
           {/* لینک‌ها */}
           <div className="grid grid-cols-2 gap-8">
             {Object.entries(footerLinks).map(([section, links]) => (
@@ -181,28 +200,6 @@ export default function Footer() {
                 </ul>
               </div>
             ))}
-          </div>
-
-          {/* اطلاعات تماس */}
-          <div>
-            <h4 className="font-heading font-semibold text-background text-sm mb-5">
-              اطلاعات تماس
-            </h4>
-
-            <ul className="space-y-4">
-              {contactInfo.map(({ icon: Icon, text }) => (
-                <li
-                  key={text}
-                  className="flex items-start gap-3 text-sm text-background/50"
-                >
-                  <Icon
-                    size={17}
-                    className="mt-0.5 shrink-0 text-background/70"
-                  />
-                  <span>{text}</span>
-                </li>
-              ))}
-            </ul>
           </div>
 
           {/* شبکه‌های اجتماعی */}
