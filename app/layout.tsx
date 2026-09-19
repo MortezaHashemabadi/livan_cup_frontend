@@ -11,8 +11,8 @@ import CartDrawer from "@/components/cart/CartDrawer";
 import AuthModal from "@/components/auth/AuthModal";
 
 export const metadata: Metadata = {
-  title: "لیوان کاپس",
-  description: "فروش آنلاین لیوان کاغذی و پلاستیکی",
+  title: "بگ کاپ",
+  description: "فروش آنلاین لیوان کاغذی و بگ پارچه ای",
   icons: {
     icon: "/icon.png",
   },

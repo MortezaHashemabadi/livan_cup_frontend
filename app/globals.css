@@ -3,6 +3,14 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@font-face {
+  font-family: "LogoFont";
+  src: url("/fonts/14.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: 30 100% 97%;
   --foreground: 0 0% 13%;

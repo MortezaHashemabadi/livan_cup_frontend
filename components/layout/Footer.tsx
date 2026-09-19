@@ -20,7 +20,7 @@ const contactInfo = [
   { icon: Mail, text: "info@bagcup.ir" },
   {
     icon: MapPin,
-    text: "تهران، شهرک صنعتی، خیابان تولید، پلاک ۱۲",
+    text: "بجنورد، شهرک صنعتی، خیابان تولید، پلاک ۱۲",
   },
   {
     icon: Clock,
