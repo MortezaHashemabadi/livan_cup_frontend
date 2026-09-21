@@ -94,6 +94,10 @@ export const catalogApi = {
   product: (slug: string) => api.get<Product>(`/catalog/products/${slug}/`),
   topSellingVariants: () =>
     api.get<TopSellingVariant[]>("/catalog/variants/top-selling/"),
+  productCards: (categorySlug?: string) =>
+    api.get<ProductCardData[]>(
+      `/catalog/product-cards/${categorySlug ? `?category=${categorySlug}` : ""}`,
+    ),
 };
 
 export function getPrimaryImage(product: Product): string | null {
@@ -260,5 +264,45 @@ export function topSellingToVariantItems(
       created_at: v.created_at,
       is_designable: v.is_designable,
     },
+  }));
+}
+export interface ProductCardOption {
+  slug: string;
+  label: string;
+  values: string[];
+}
+export interface ProductCardData {
+  id: number;
+  name: string;
+  link: string;
+  primary_image: string | null;
+  hover_image: string | null;
+  options: ProductCardOption[];
+  filter_data: Record<string, string>;
+  price_from: string;
+  price_to: string;
+  category: number;
+}
+export function getProductCardAttributeGroups(
+  products: ProductCardData[],
+): AttributeGroup[] {
+  const groups: Record<string, AttributeGroup & { valueSet: Set<string> }> = {};
+  products.forEach((p) => {
+    p.options.forEach((opt) => {
+      if (!groups[opt.slug]) {
+        groups[opt.slug] = {
+          slug: opt.slug,
+          label: opt.label,
+          values: [],
+          valueSet: new Set(),
+        };
+      }
+      opt.values.forEach((v) => groups[opt.slug].valueSet.add(v));
+    });
+  });
+  return Object.values(groups).map((g) => ({
+    slug: g.slug,
+    label: g.label,
+    values: Array.from(g.valueSet),
   }));
 }

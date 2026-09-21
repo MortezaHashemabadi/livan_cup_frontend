@@ -25,3 +25,10 @@ export function useTopSellingVariants() {
     queryFn: catalogApi.topSellingVariants,
   });
 }
+
+export function useProductCards(categorySlug?: string) {
+  return useQuery({
+    queryKey: ["product-cards", categorySlug],
+    queryFn: () => catalogApi.productCards(categorySlug),
+  });
+}

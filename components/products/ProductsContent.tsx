@@ -1,11 +1,9 @@
 "use client";
 import { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { useProducts } from "@/lib/hooks/use-catalog";
-import {
-  getProductListAttributeGroups,
-} from "@/lib/api/endpoints/catalog";
-import ProductCard from "@/components/products/ProductCard";
+import { useProductCards } from "@/lib/hooks/use-catalog";
+import { getProductCardAttributeGroups } from "@/lib/api/endpoints/catalog";
+import ProductCardNew from "@/components/products/ProductCardNew";
 import ProductFilters from "@/components/products/ProductFilters";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -15,26 +13,24 @@ export default function ProductsPage() {
   const [attributeFilters, setAttributeFilters] = useState<
     Record<string, string>
   >({});
-  const { data: products = [], isLoading } = useProducts(category || undefined);
+  const { data: products = [], isLoading } = useProductCards(
+    category || undefined,
+  );
 
   const attributeGroups = useMemo(
-    () => getProductListAttributeGroups(products),
+    () => getProductCardAttributeGroups(products),
     [products],
   );
-  
-  const variantItems = useMemo(() => {
+
+  const filteredProducts = useMemo(() => {
     const active = Object.entries(attributeFilters).filter(([, v]) => v);
-    return products.flatMap((product) =>
-      product.variants
-        .filter((variant) => {
-          if (active.length === 0) return true;
-          return active.every(([slug, value]) =>
-            variant.attribute_values.some(
-              (av) => av.attribute_slug === slug && av.value === value,
-            ),
-          );
-        })
-        .map((variant) => ({ product, variant })),
+    if (active.length === 0) return products;
+    return products.filter((product) =>
+      active.every(([slug, value]) =>
+        product.options.some(
+          (opt) => opt.slug === slug && opt.values.includes(value),
+        ),
+      ),
     );
   }, [products, attributeFilters]);
 
@@ -94,7 +90,7 @@ export default function ProductsPage() {
               <p className="text-sm text-muted-foreground">
                 {isLoading
                   ? "در حال بارگذاری..."
-                  : `${variantItems.length.toLocaleString("fa-IR")} محصول`}
+                  : `${filteredProducts.length.toLocaleString("fa-IR")} محصول`}
               </p>
             </div>
 
@@ -110,14 +106,14 @@ export default function ProductsPage() {
                     </div>
                   ))}
               </div>
-            ) : variantItems.length === 0 ? (
+            ) : filteredProducts.length === 0 ? (
               <div className="text-center py-20">
                 <p className="text-muted-foreground mb-2">محصولی یافت نشد</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {variantItems.map((item) => (
-                  <ProductCard key={item.variant.id} item={item} />
+                {filteredProducts.map((item) => (
+                  <ProductCardNew key={item.id} item={item} />
                 ))}
               </div>
             )}

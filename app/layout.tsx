@@ -31,7 +31,7 @@ export default function RootLayout({
             <AuthModalProvider>
               <CartProvider>
                 <Header />
-                <main className="flex-1 pt-20">{children}</main>
+                <main className="flex-1 pt-20 mb-24">{children}</main>
                 <Footer />
                 <CartDrawer />
                 <AuthModal />
