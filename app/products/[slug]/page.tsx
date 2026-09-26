@@ -24,6 +24,8 @@ import { toast } from "sonner";
 import { useProduct } from "@/lib/hooks/use-catalog";
 import {
   getAttributeGroups,
+  getPairwiseReachableValues,
+  getBlockingAttributes,
   findVariant,
   getUnitPrice,
   getVariantImage,
@@ -88,6 +90,7 @@ export default function ProductDetailPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selected, setSelected] = useState<Record<string, string>>({});
+  const [hintKey, setHintKey] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(100);
   const { data: savedDesigns = [] } = useDesigns();
   const [selectedDesignId, setSelectedDesignId] = useState<number | null>(null);
@@ -156,6 +159,8 @@ export default function ProductDetailPage() {
   }
 
   const attributeGroups = getAttributeGroups(product);
+  const availableGroups = getAttributeGroups(product, selected);
+  const pairwiseReachable = getPairwiseReachableValues(product, selected);
   const matchedVariant = findVariant(product, selected);
   const unitPrice = matchedVariant
     ? getUnitPrice(matchedVariant, quantity)
@@ -173,11 +178,7 @@ export default function ProductDetailPage() {
 
   const handleSelect = (groupSlug: string, value: string) => {
     const next = { ...selected, [groupSlug]: value };
-    const exists = findVariant(product, next);
-    if (!exists) {
-      toast.error("این ترکیب موجود نیست");
-      return;
-    }
+    if (!findVariant(product, next)) return;
     setSelected(next);
   };
 
@@ -381,19 +382,51 @@ export default function ProductDetailPage() {
                 <div key={group.slug}>
                   <p className="text-sm font-medium mb-2.5">{group.label}</p>
                   <div className="flex flex-wrap gap-2">
-                    {group.values.map((value) => (
-                      <button
-                        key={value}
-                        onClick={() => handleSelect(group.slug, value)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                          selected[group.slug] === value
-                            ? "bg-foreground text-background"
-                            : "bg-secondary text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        {value}
-                      </button>
-                    ))}
+                    {group.values.filter((value) =>
+                      pairwiseReachable[group.slug]?.has(value) ?? true,
+                    ).map((value) => {
+                      const isAvailable =
+                        availableGroups
+                          .find((g) => g.slug === group.slug)
+                          ?.values.includes(value) ?? false;
+                      const key = `${group.slug}-${value}`;
+                      const blockers = !isAvailable
+                        ? getBlockingAttributes(product, selected, group.slug, value)
+                        : [];
+                      const hintText =
+                        blockers.length > 0
+                          ? `در ${blockers.map((b) => b.value).join(" و ")} موجود نیست`
+                          : "با این ترکیب موجود نیست";
+                      return (
+                        <div key={value} className="relative">
+                          {hintKey === key && (
+                            <div className="absolute -top-9 right-1/2 translate-x-1/2 whitespace-nowrap bg-foreground text-background text-xs px-3 py-1.5 rounded-lg z-10">
+                              {hintText}
+                            </div>
+                          )}
+                          <button
+                            onMouseEnter={() => !isAvailable && setHintKey(key)}
+                            onMouseLeave={() => setHintKey(null)}
+                            onClick={() => {
+                              if (!isAvailable) {
+                                setHintKey(key);
+                                return;
+                              }
+                              handleSelect(group.slug, value);
+                            }}
+                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                              !isAvailable
+                                ? "bg-secondary/40 text-muted-foreground/30 cursor-not-allowed"
+                                : selected[group.slug] === value
+                                  ? "bg-foreground text-background"
+                                  : "bg-secondary text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {value}
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               ))}

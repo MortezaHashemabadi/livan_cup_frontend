@@ -13,9 +13,14 @@ export default function ProductsPage() {
   const [attributeFilters, setAttributeFilters] = useState<
     Record<string, string>
   >({});
-  const { data: products = [], isLoading } = useProductCards(
-    category || undefined,
+  const [extraFilters, setExtraFilters] = useState<Record<string, string>>(
+  () =>
+    Object.fromEntries(
+      Array.from(searchParams.entries()).filter(([key]) => key !== "category"),
+    ),
   );
+  const queryParams = useMemo(() => ({ category, ...extraFilters }), [category, extraFilters]);
+  const { data: products = [], isLoading } = useProductCards(queryParams);
 
   const attributeGroups = useMemo(
     () => getProductCardAttributeGroups(products),
@@ -36,6 +41,7 @@ export default function ProductsPage() {
 
   const handleCategoryChange = (next: string) => {
     setCategory(next);
+    setExtraFilters({});
     setAttributeFilters({});
   };
 
@@ -45,6 +51,7 @@ export default function ProductsPage() {
 
   const handleClearAll = () => {
     setCategory("");
+    setExtraFilters({});
     setAttributeFilters({});
   };
 

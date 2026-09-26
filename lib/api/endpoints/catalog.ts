@@ -94,10 +94,15 @@ export const catalogApi = {
   product: (slug: string) => api.get<Product>(`/catalog/products/${slug}/`),
   topSellingVariants: () =>
     api.get<TopSellingVariant[]>("/catalog/variants/top-selling/"),
-  productCards: (categorySlug?: string) =>
-    api.get<ProductCardData[]>(
-      `/catalog/product-cards/${categorySlug ? `?category=${categorySlug}` : ""}`,
-    ),
+  productCards: (params?: Record<string, string>) => {
+    const clean = Object.fromEntries(
+      Object.entries(params ?? {}).filter(([, v]) => v),
+    );
+    const qs = new URLSearchParams(clean).toString();
+    return api.get<ProductCardData[]>(
+      `/catalog/product-cards/${qs ? `?${qs}` : ""}`,
+    );
+  },
 };
 
 export function getPrimaryImage(product: Product): string | null {
@@ -118,26 +123,109 @@ export interface AttributeGroup {
   values: string[];
 }
 
-export function getAttributeGroups(product: Product): AttributeGroup[] {
-  const groups: Record<string, AttributeGroup & { valueSet: Set<string> }> = {};
-  product.variants.forEach((v) => {
+export function getAttributeGroups(
+  product: Product,
+  selected: Record<string, string> = {},
+): AttributeGroup[] {
+  const labels: Record<string, string> = {};
+  const allSlugs = new Set<string>();
+  product.variants.forEach((v) =>
     v.attribute_values.forEach((av) => {
-      if (!groups[av.attribute_slug]) {
-        groups[av.attribute_slug] = {
-          slug: av.attribute_slug,
-          label: av.attribute,
-          values: [],
-          valueSet: new Set(),
-        };
-      }
-      groups[av.attribute_slug].valueSet.add(av.value);
+      allSlugs.add(av.attribute_slug);
+      labels[av.attribute_slug] = av.attribute;
+    }),
+  );
+
+  return Array.from(allSlugs).map((slug) => {
+    const valueSet = new Set<string>();
+    product.variants.forEach((v) => {
+      const matchesOthers = Object.entries(selected).every(
+        ([otherSlug, otherValue]) =>
+          otherSlug === slug ||
+          v.attribute_values.some(
+            (av) => av.attribute_slug === otherSlug && av.value === otherValue,
+          ),
+      );
+      if (!matchesOthers) return;
+      const av = v.attribute_values.find((a) => a.attribute_slug === slug);
+      if (av) valueSet.add(av.value);
     });
+    return { slug, label: labels[slug], values: Array.from(valueSet) };
   });
-  return Object.values(groups).map((g) => ({
-    slug: g.slug,
-    label: g.label,
-    values: Array.from(g.valueSet),
-  }));
+}
+
+export function getPairwiseReachableValues(
+  product: Product,
+  selected: Record<string, string>,
+): Record<string, Set<string>> {
+  const result: Record<string, Set<string>> = {};
+  const allSlugs = new Set<string>();
+  product.variants.forEach((v) =>
+    v.attribute_values.forEach((av) => allSlugs.add(av.attribute_slug)),
+  );
+
+  allSlugs.forEach((slug) => {
+    const otherSelected = Object.entries(selected).filter(([s]) => s !== slug);
+    const allValuesForSlug = new Set<string>();
+    product.variants.forEach((v) => {
+      const av = v.attribute_values.find((a) => a.attribute_slug === slug);
+      if (av) allValuesForSlug.add(av.value);
+    });
+
+    const reachable = new Set<string>();
+    allValuesForSlug.forEach((val) => {
+      const passesAll = otherSelected.every(([otherSlug, otherValue]) =>
+        product.variants.some(
+          (v) =>
+            v.attribute_values.some((a) => a.attribute_slug === slug && a.value === val) &&
+            v.attribute_values.some((a) => a.attribute_slug === otherSlug && a.value === otherValue),
+        ),
+      );
+      if (passesAll) reachable.add(val);
+    });
+    result[slug] = reachable;
+  });
+  return result;
+}
+
+export function getBlockingAttributes(
+  product: Product,
+  selected: Record<string, string>,
+  slug: string,
+  value: string,
+): { slug: string; label: string; value: string }[] {
+  const others = Object.entries(selected).filter(([s]) => s !== slug);
+  const labelOf = (s: string) =>
+    product.variants
+      .flatMap((v) => v.attribute_values)
+      .find((a) => a.attribute_slug === s)?.attribute ?? s;
+
+  const combinationExists = (subset: [string, string][]) =>
+    product.variants.some(
+      (v) =>
+        v.attribute_values.some((a) => a.attribute_slug === slug && a.value === value) &&
+        subset.every(([s, val]) =>
+          v.attribute_values.some((a) => a.attribute_slug === s && a.value === val),
+        ),
+    );
+
+  const kCombinations = (arr: [string, string][], k: number): [string, string][][] => {
+    if (k === 0) return [[]];
+    if (arr.length < k) return [];
+    const [first, ...rest] = arr;
+    const withFirst = kCombinations(rest, k - 1).map((c) => [first, ...c]);
+    const withoutFirst = kCombinations(rest, k);
+    return [...withFirst, ...withoutFirst];
+  };
+
+  for (let size = 1; size <= others.length; size++) {
+    for (const combo of kCombinations(others, size)) {
+      if (!combinationExists(combo)) {
+        return combo.map(([s, val]) => ({ slug: s, label: labelOf(s), value: val }));
+      }
+    }
+  }
+  return [];
 }
 
 export function findVariant(

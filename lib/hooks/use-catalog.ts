@@ -26,9 +26,9 @@ export function useTopSellingVariants() {
   });
 }
 
-export function useProductCards(categorySlug?: string) {
+export function useProductCards(params: Record<string, string>) {
   return useQuery({
-    queryKey: ["product-cards", categorySlug],
-    queryFn: () => catalogApi.productCards(categorySlug),
+    queryKey: ["product-cards", params],
+    queryFn: () => catalogApi.productCards(params),
   });
 }
