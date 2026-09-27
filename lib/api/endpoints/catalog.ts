@@ -365,6 +365,7 @@ export function topSellingToVariantItems(
       available_from: v.available_from,
       price_tiers: v.price_tiers,
       related_variants: v.related_variants ?? [],
+      option_groups: [],
       created_at: v.created_at,
       is_designable: v.is_designable,
     },
