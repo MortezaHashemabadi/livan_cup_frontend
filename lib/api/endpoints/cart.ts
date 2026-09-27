@@ -29,6 +29,9 @@ export const cartApi = {
     design?: number;
     quantity: number;
     print_file?: File;
+    selected_option_ids?: number[];
+    fabric_color?: string;
+    print_color?: string;
   }) => {
     if (payload.print_file) {
       const formData = new FormData();
@@ -36,6 +39,18 @@ export const cartApi = {
       formData.append("quantity", String(payload.quantity));
       if (payload.design) formData.append("design", String(payload.design));
       formData.append("print_file", payload.print_file);
+      if (payload.selected_option_ids) {
+        formData.append(
+          "selected_option_ids",
+          JSON.stringify(payload.selected_option_ids),
+        );
+      }
+      if (payload.fabric_color) {
+        formData.append("fabric_color", payload.fabric_color);
+      }
+      if (payload.print_color) {
+        formData.append("print_color", payload.print_color);
+      }
       return api.post<CartItem>("/cart/items/", formData, { isFormData: true });
     }
     return api.post<CartItem>("/cart/items/", payload);

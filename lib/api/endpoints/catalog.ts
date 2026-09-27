@@ -30,6 +30,21 @@ export interface RelatedVariant {
   price_tiers: PriceTier[];
 }
 
+export interface OptionChoice {
+  id: number;
+  name: string;
+  price_modifier: string;
+  is_default: boolean;
+  order: number;
+}
+
+export interface OptionGroup {
+  id: number;
+  name: string;
+  is_required: boolean;
+  choices: OptionChoice[];
+}
+
 export interface Variant {
   id: number;
   sku: string;
@@ -39,6 +54,7 @@ export interface Variant {
   available_from: string | null;
   price_tiers: PriceTier[];
   related_variants: RelatedVariant[];
+  option_groups: OptionGroup[];
   created_at: string;
   is_designable: boolean;
 }

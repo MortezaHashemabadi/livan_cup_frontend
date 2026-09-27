@@ -16,6 +16,9 @@ interface CartContextValue {
     quantity: number,
     design?: number,
     printFile?: File,
+    selectedOptionIds?: number[],
+    fabricColor?: string,
+    printColor?: string,
   ) => Promise<void>;
   updateQuantity: (itemId: number, quantity: number) => void;
   removeItem: (itemId: number) => void;
@@ -71,6 +74,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     quantity: number,
     design?: number,
     printFile?: File,
+    selectedOptionIds?: number[],
+    fabricColor?: string,
+    printColor?: string,
   ) => {
     if (!isAuthenticated) {
       openAuthModal();
@@ -81,6 +87,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       design,
       quantity,
       print_file: printFile,
+      selected_option_ids: selectedOptionIds,
+      fabric_color: fabricColor,
+      print_color: printColor,
     });
   };
 

@@ -96,7 +96,7 @@ export default function ProductCard({ item }: { item: VariantListItem }) {
               <Button
                 onClick={handleAdd}
                 size="sm"
-                className="bg-foreground hover:bg-foreground/90 text-background rounded-full h-10 px-5 text-xs font-medium shadow-lg"
+                className="!bg-white !text-foreground !border-none !shadow-lg hover:!bg-white rounded-full h-10 px-5 text-xs font-medium shadow-lg cursor-pointer"
               >
                 افزودن به سبد
               </Button>

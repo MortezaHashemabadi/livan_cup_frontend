@@ -19,6 +19,14 @@ import {
   Users,
 } from "lucide-react";
 import RecommendedProducts from "@/components/products/RecommendedProducts";
+import ColorPickerInput from "@/components/products/ColorPickerInput";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useProduct } from "@/lib/hooks/use-catalog";
@@ -29,6 +37,7 @@ import {
   findVariant,
   getUnitPrice,
   getVariantImage,
+  type OptionGroup,
 } from "@/lib/api/endpoints/catalog";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
@@ -90,6 +99,11 @@ export default function ProductDetailPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selected, setSelected] = useState<Record<string, string>>({});
+  const [selectedOptions, setSelectedOptions] = useState<
+    Record<number, number>
+  >({});
+  const [fabricColor, setFabricColor] = useState("تک رنگ روشن");
+  const [printColor, setPrintColor] = useState("");
   const [hintKey, setHintKey] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(100);
   const { data: savedDesigns = [] } = useDesigns();
@@ -162,19 +176,32 @@ export default function ProductDetailPage() {
   const availableGroups = getAttributeGroups(product, selected);
   const pairwiseReachable = getPairwiseReachableValues(product, selected);
   const matchedVariant = findVariant(product, selected);
-  const unitPrice = matchedVariant
+  const getEffectiveChoiceId = (group: OptionGroup): number | undefined => {
+    if (selectedOptions[group.id] !== undefined)
+      return selectedOptions[group.id];
+    if (group.name === "نوع دستگیره") {
+      return group.choices.find((c) => c.name === "پانچ")?.id;
+    }
+    return group.choices.find((c) => c.is_default)?.id;
+  };
+  const baseUnitPrice = matchedVariant
     ? getUnitPrice(matchedVariant, quantity)
     : null;
+  const optionTotal = matchedVariant
+    ? matchedVariant.option_groups.reduce((sum, g) => {
+        const choice = g.choices.find(
+          (c) => c.id === getEffectiveChoiceId(g),
+        );
+        return sum + (choice ? parseFloat(choice.price_modifier) : 0);
+      }, 0)
+    : 0;
+  const unitPrice =
+    baseUnitPrice !== null ? baseUnitPrice + optionTotal : null;
   const totalPrice = unitPrice !== null ? unitPrice * quantity : null;
 
-  const variantImage = matchedVariant ? getVariantImage(matchedVariant) : null;
-  const baseImage = variantImage
-    ? `${NEXT_PUBLIC_MEDIA_URL}${variantImage}`
-    : null;
-
-
-  const displayImage = baseImage;
-  displayImageRef.current = baseImage;
+  const variantImages = matchedVariant
+    ? [...matchedVariant.images].sort((a, b) => a.order - b.order)
+    : [];
 
   const handleSelect = (groupSlug: string, value: string) => {
     const next = { ...selected, [groupSlug]: value };
@@ -182,32 +209,46 @@ export default function ProductDetailPage() {
     setSelected(next);
   };
 
-  const handleAddToCart = () => {
-    if (!matchedVariant) return;
-    if (matchedVariant.stock_status !== "in_stock") {
-      toast.error("این ترکیب در حال حاضر موجود نیست");
-      return;
-    }
-    // اگه چند فایل آپلود شده، برای هر فایل یه آیتم جدا اضافه می‌کنیم
-    if (uploadedFiles.length > 0) {
-      uploadedFiles.forEach((file) => {
+    const handleAddToCart = () => {
+      if (!matchedVariant) return;
+      if (matchedVariant.stock_status !== "in_stock") {
+        toast.error("این ترکیب در حال حاضر موجود نیست");
+        return;
+      }
+      const selectedOptionIds = matchedVariant.option_groups
+        .map((g) => getEffectiveChoiceId(g))
+        .filter((id): id is number => id !== undefined);
+      // اگه چند فایل آپلود شده، برای هر فایل یه آیتم جدا اضافه می‌کنیم
+      if (uploadedFiles.length > 0) {
+        uploadedFiles.forEach((file) => {
+          addItem(
+            matchedVariant.id,
+            quantity,
+            selectedDesignId ?? undefined,
+            file,
+            selectedOptionIds,
+            fabricColor || undefined,
+            printColor || undefined,
+          );
+          if (designMode === "consultation") {
+            sessionStorage.setItem("needs_design_consultation", "1");
+          }
+        });
+      } else {
         addItem(
           matchedVariant.id,
           quantity,
           selectedDesignId ?? undefined,
-          file,
+          undefined,
+          selectedOptionIds,
+          fabricColor || undefined,
+          printColor || undefined,
         );
         if (designMode === "consultation") {
           sessionStorage.setItem("needs_design_consultation", "1");
         }
-      });
-    } else {
-      addItem(matchedVariant.id, quantity, selectedDesignId ?? undefined);
-      if (designMode === "consultation") {
-        sessionStorage.setItem("needs_design_consultation", "1");
       }
-    }
-  };
+    };
 
   return (
     <div className="pt-8 pb-20">
@@ -221,30 +262,35 @@ export default function ProductDetailPage() {
         </Link>
 
         <div className="grid lg:grid-cols-2 gap-12 xl:gap-16 items-start">
-          <div className="lg:sticky lg:top-28 space-y-6">
-            <div className="relative rounded-[40px] bg-cream overflow-hidden aspect-square">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={displayImage ?? "placeholder"}
-                  initial={{ opacity: 0, scale: 1.02 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full h-full"
-                >
-                  {displayImage ? (
-                    <img
-                      src={displayImage}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
+          <div className="lg:sticky lg:top-28 space-y-6 lg:max-w-md">
+            <div className="relative rounded-[40px] bg-cream overflow-hidden">
+              <Carousel opts={{ direction: "rtl" }} className="w-full">
+                <CarouselContent className="ms-0">
+                  {variantImages.length > 0 ? (
+                    variantImages.map((img) => (
+                      <CarouselItem key={img.id} className="ps-0">
+                        <img
+                          src={`${NEXT_PUBLIC_MEDIA_URL}${img.image}`}
+                          alt={img.alt_text || product.name}
+                          className="w-full aspect-square object-cover"
+                        />
+                      </CarouselItem>
+                    ))
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <ShoppingBag className="w-16 h-16 text-muted-foreground/20" />
-                    </div>
+                    <CarouselItem className="ps-0">
+                      <div className="w-full aspect-square flex items-center justify-center">
+                        <ShoppingBag className="w-16 h-16 text-muted-foreground/20" />
+                      </div>
+                    </CarouselItem>
                   )}
-                </motion.div>
-              </AnimatePresence>
+                </CarouselContent>
+                {variantImages.length > 1 && (
+                  <>
+                    <CarouselPrevious className="!start-auto !inset-y-auto !top-1/2 !-translate-y-1/2 !right-3 !bg-white !text-foreground !border-none !shadow-lg hover:!bg-white" />
+                    <CarouselNext className="!end-auto !inset-y-auto !top-1/2 !-translate-y-1/2 !left-3 !bg-white !text-foreground !border-none !shadow-lg hover:!bg-white" />
+                  </>
+                )}
+              </Carousel>
 
               {matchedVariant?.stock_status === "out_of_stock" && (
                 <div className="absolute top-5 right-5 bg-destructive text-white rounded-full px-3 py-1.5 text-xs font-semibold">
@@ -292,7 +338,9 @@ export default function ProductDetailPage() {
                         <span
                           className={`font-heading font-bold text-sm ${isActive ? "text-cobalt" : "text-foreground"}`}
                         >
-                          {parseFloat(tier.unit_price).toLocaleString("fa-IR")}{" "}
+                          {(
+                            parseFloat(tier.unit_price) + optionTotal
+                          ).toLocaleString("fa-IR")}{" "}
                           تومان
                         </span>
                       </div>
@@ -382,51 +430,61 @@ export default function ProductDetailPage() {
                 <div key={group.slug}>
                   <p className="text-sm font-medium mb-2.5">{group.label}</p>
                   <div className="flex flex-wrap gap-2">
-                    {group.values.filter((value) =>
-                      pairwiseReachable[group.slug]?.has(value) ?? true,
-                    ).map((value) => {
-                      const isAvailable =
-                        availableGroups
-                          .find((g) => g.slug === group.slug)
-                          ?.values.includes(value) ?? false;
-                      const key = `${group.slug}-${value}`;
-                      const blockers = !isAvailable
-                        ? getBlockingAttributes(product, selected, group.slug, value)
-                        : [];
-                      const hintText =
-                        blockers.length > 0
-                          ? `در ${blockers.map((b) => b.value).join(" و ")} موجود نیست`
-                          : "با این ترکیب موجود نیست";
-                      return (
-                        <div key={value} className="relative">
-                          {hintKey === key && (
-                            <div className="absolute -top-9 right-1/2 translate-x-1/2 whitespace-nowrap bg-foreground text-background text-xs px-3 py-1.5 rounded-lg z-10">
-                              {hintText}
-                            </div>
-                          )}
-                          <button
-                            onMouseEnter={() => !isAvailable && setHintKey(key)}
-                            onMouseLeave={() => setHintKey(null)}
-                            onClick={() => {
-                              if (!isAvailable) {
-                                setHintKey(key);
-                                return;
+                    {group.values
+                      .filter(
+                        (value) =>
+                          pairwiseReachable[group.slug]?.has(value) ?? true,
+                      )
+                      .map((value) => {
+                        const isAvailable =
+                          availableGroups
+                            .find((g) => g.slug === group.slug)
+                            ?.values.includes(value) ?? false;
+                        const key = `${group.slug}-${value}`;
+                        const blockers = !isAvailable
+                          ? getBlockingAttributes(
+                              product,
+                              selected,
+                              group.slug,
+                              value,
+                            )
+                          : [];
+                        const hintText =
+                          blockers.length > 0
+                            ? `در ${blockers.map((b) => b.value).join(" و ")} موجود نیست`
+                            : "با این ترکیب موجود نیست";
+                        return (
+                          <div key={value} className="relative">
+                            {hintKey === key && (
+                              <div className="absolute -top-9 right-1/2 translate-x-1/2 whitespace-nowrap bg-foreground text-background text-xs px-3 py-1.5 rounded-lg z-10">
+                                {hintText}
+                              </div>
+                            )}
+                            <button
+                              onMouseEnter={() =>
+                                !isAvailable && setHintKey(key)
                               }
-                              handleSelect(group.slug, value);
-                            }}
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                              !isAvailable
-                                ? "bg-secondary/40 text-muted-foreground/30 cursor-not-allowed"
-                                : selected[group.slug] === value
-                                  ? "bg-foreground text-background"
-                                  : "bg-secondary text-muted-foreground hover:text-foreground"
-                            }`}
-                          >
-                            {value}
-                          </button>
-                        </div>
-                      );
-                    })}
+                              onMouseLeave={() => setHintKey(null)}
+                              onClick={() => {
+                                if (!isAvailable) {
+                                  setHintKey(key);
+                                  return;
+                                }
+                                handleSelect(group.slug, value);
+                              }}
+                              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                                !isAvailable
+                                  ? "bg-secondary/40 text-muted-foreground/30 cursor-not-allowed"
+                                  : selected[group.slug] === value
+                                    ? "bg-foreground text-background"
+                                    : "bg-secondary text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              {value}
+                            </button>
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               ))}
@@ -436,7 +494,121 @@ export default function ProductDetailPage() {
                 </p>
               )}
             </div>
+            {matchedVariant &&
+              matchedVariant.option_groups.length > 0 &&
+              (() => {
+                const priorityOrder = ["نوع دستگیره", "تعداد رنگ", "رنگ چاپ"];
+                const orderedGroups = [
+                  ...priorityOrder
+                    .map((name) =>
+                      matchedVariant.option_groups.find((g) => g.name === name),
+                    )
+                    .filter((g): g is NonNullable<typeof g> => !!g),
+                  ...matchedVariant.option_groups.filter(
+                    (g) => !priorityOrder.includes(g.name),
+                  ),
+                ];
+                return (
+                  <div className="bg-secondary/40 rounded-3xl p-6 space-y-6">
+                    <SectionLabel>گزینه‌های تولید</SectionLabel>
+                    {orderedGroups.map((group) => {
+                      const renderChoices = () => (
+                        <>
+                          <p className="text-sm font-medium mb-2.5">
+                            {group.name}
+                            {group.is_required && (
+                              <span className="text-destructive"> *</span>
+                            )}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {group.choices.map((choice) => (
+                              <button
+                                key={choice.id}
+                                onClick={() =>
+                                  setSelectedOptions((prev) => ({
+                                    ...prev,
+                                    [group.id]: choice.id,
+                                  }))
+                                }
+                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                                  getEffectiveChoiceId(group) === choice.id
+                                    ? "bg-foreground text-background"
+                                    : "bg-secondary text-muted-foreground hover:text-foreground"
+                                }`}
+                              >
+                                {choice.name}
+                                {parseFloat(choice.price_modifier) !== 0 && (
+                                  <span className="opacity-70">
+                                    {" "}
+                                    (
+                                    {parseFloat(choice.price_modifier) > 0
+                                      ? "+"
+                                      : ""}
+                                    {parseFloat(
+                                      choice.price_modifier,
+                                    ).toLocaleString("fa-IR")}
+                                    )
+                                  </span>
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        </>
+                      );
 
+                      if (group.name === "تعداد رنگ") {
+                        return (
+                          <div
+                            key={group.id}
+                            className="grid grid-cols-2 gap-4"
+                          >
+                            <div>{renderChoices()}</div>
+                            <div>
+                              <p className="text-sm font-medium mb-2.5">
+                                رنگ پارچه
+                              </p>
+                              <ColorPickerInput
+                                value={fabricColor}
+                                onChange={setFabricColor}
+                                placeholder="مثلاً سرمه‌ای"
+                              />
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (group.name === "رنگ چاپ") {
+                        const showPrintColor =
+                          group.choices.find(
+                            (c) => c.id === getEffectiveChoiceId(group),
+                          )?.name === "معمولی";
+                        return (
+                          <div
+                            key={group.id}
+                            className="grid grid-cols-1 gap-4"
+                          >
+                            <div>{renderChoices()}</div>
+                            {showPrintColor && (
+                              <div>
+                                <p className="text-sm font-medium mb-2.5">
+                                  رنگ چاپ دلخواه
+                                </p>
+                                <ColorPickerInput
+                                  value={printColor}
+                                  onChange={setPrintColor}
+                                  placeholder="مثلاً قرمز"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      return <div key={group.id}>{renderChoices()}</div>;
+                    })}
+                  </div>
+                );
+              })()}
             <div className="bg-secondary/40 rounded-3xl overflow-hidden">
               <div className="px-6 pt-6 pb-4">
                 <SectionLabel>گزینه‌های طراحی</SectionLabel>
