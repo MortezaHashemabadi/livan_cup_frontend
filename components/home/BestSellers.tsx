@@ -40,20 +40,20 @@ export default function BestSellers() {
         ) : (
           <Carousel
             opts={{ align: "start", direction: "rtl" }}
-            className="w-full"
+            className="w-full min-w-0"
           >
             <CarouselContent className="-me-4">
               {variantItems.map((item) => (
                 <CarouselItem
                   key={item.variant.id}
-                  className="pe-4 basis-1/2 sm:basis-1/3 lg:basis-1/4"
+                  className="pe-4 basis-1/2 sm:basis-1/3 lg:basis-1/4 min-w-0"
                 >
                   <ProductCard item={item} />
                 </CarouselItem>
               ))}
             </CarouselContent>
             <CarouselPrevious />
-            <CarouselNext />
+            {/* <CarouselNext /> */}
           </Carousel>
         )}
       </div>
