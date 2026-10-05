@@ -357,6 +357,7 @@ export function topSellingToVariantItems(
       name: v.product_name,
       slug: v.product_slug,
       description: "",
+      features: [],
       category: "",
       category_slug: "",
       images: [],
