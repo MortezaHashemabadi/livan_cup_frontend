@@ -64,11 +64,17 @@ export interface Product {
   name: string;
   slug: string;
   description: string;
+  features: string[];
   category: string;
   category_slug: string;
   images: ProductImage[];
   variants: Variant[];
   is_designable: boolean;
+}
+
+export interface PriceTableAxes {
+  rows: string[];
+  columns: string[];
 }
 
 export interface Category {
@@ -79,6 +85,7 @@ export interface Category {
   is_accessory: boolean;
   description: string;
   image: string | null;
+  price_table_axes: PriceTableAxes | null;
 }
 
 export interface TopSellingVariant {

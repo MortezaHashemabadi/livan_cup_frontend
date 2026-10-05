@@ -253,13 +253,15 @@ export default function ProductDetailPage() {
   return (
     <div className="pt-8 pb-20">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <Link
-          href="/products"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          بازگشت به محصولات
-        </Link>
+        <div className="flex justify-end">
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+          >
+            بازگشت به محصولات
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+        </div>
 
         <div className="grid lg:grid-cols-2 gap-12 xl:gap-16 items-start">
           <div className="lg:sticky lg:top-28 space-y-6 lg:max-w-md">
@@ -422,72 +424,87 @@ export default function ProductDetailPage() {
               <p className="text-muted-foreground leading-relaxed">
                 {product.description}
               </p>
+              <p className="text-muted-foreground leading-relaxed">
+                {product.description}
+              </p>
+              {product.features.length > 0 && (
+                <ul className="grid sm:grid-cols-1 gap-3 mt-5">
+                  {product.features.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm ">
+                      <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
-            <div className="bg-secondary/40 rounded-3xl p-6 space-y-6">
+            <div className="bg-secondary/40 rounded-3xl p-6">
               <SectionLabel>تنظیمات سفارش</SectionLabel>
-              {attributeGroups.map((group) => (
-                <div key={group.slug}>
-                  <p className="text-sm font-medium mb-2.5">{group.label}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {group.values
-                      .filter(
-                        (value) =>
-                          pairwiseReachable[group.slug]?.has(value) ?? true,
-                      )
-                      .map((value) => {
-                        const isAvailable =
-                          availableGroups
-                            .find((g) => g.slug === group.slug)
-                            ?.values.includes(value) ?? false;
-                        const key = `${group.slug}-${value}`;
-                        const blockers = !isAvailable
-                          ? getBlockingAttributes(
-                              product,
-                              selected,
-                              group.slug,
-                              value,
-                            )
-                          : [];
-                        const hintText =
-                          blockers.length > 0
-                            ? `در ${blockers.map((b) => b.value).join(" و ")} موجود نیست`
-                            : "با این ترکیب موجود نیست";
-                        return (
-                          <div key={value} className="relative">
-                            {hintKey === key && (
-                              <div className="absolute -top-9 right-1/2 translate-x-1/2 whitespace-nowrap bg-foreground text-background text-xs px-3 py-1.5 rounded-lg z-10">
-                                {hintText}
-                              </div>
-                            )}
-                            <button
-                              onMouseEnter={() =>
-                                !isAvailable && setHintKey(key)
-                              }
-                              onMouseLeave={() => setHintKey(null)}
-                              onClick={() => {
-                                if (!isAvailable) {
-                                  setHintKey(key);
-                                  return;
+              <div className="flex flex-wrap gap-x-8 gap-y-5">
+                {attributeGroups.map((group) => (
+                  <div key={group.slug} className="min-w-[140px]">
+                    <p className="text-sm font-medium mb-2.5">{group.label}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {group.values
+                        .filter(
+                          (value) =>
+                            pairwiseReachable[group.slug]?.has(value) ?? true,
+                        )
+                        .map((value) => {
+                          const isAvailable =
+                            availableGroups
+                              .find((g) => g.slug === group.slug)
+                              ?.values.includes(value) ?? false;
+                          const key = `${group.slug}-${value}`;
+                          const blockers = !isAvailable
+                            ? getBlockingAttributes(
+                                product,
+                                selected,
+                                group.slug,
+                                value,
+                              )
+                            : [];
+                          const hintText =
+                            blockers.length > 0
+                              ? `در ${blockers.map((b) => b.value).join(" و ")} موجود نیست`
+                              : "با این ترکیب موجود نیست";
+                          return (
+                            <div key={value} className="relative">
+                              {hintKey === key && (
+                                <div className="absolute -top-9 right-1/2 translate-x-1/2 whitespace-nowrap bg-foreground text-background text-xs px-3 py-1.5 rounded-lg z-10">
+                                  {hintText}
+                                </div>
+                              )}
+                              <button
+                                onMouseEnter={() =>
+                                  !isAvailable && setHintKey(key)
                                 }
-                                handleSelect(group.slug, value);
-                              }}
-                              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                                !isAvailable
-                                  ? "bg-secondary/40 text-muted-foreground/30 cursor-not-allowed"
-                                  : selected[group.slug] === value
-                                    ? "bg-foreground text-background"
-                                    : "bg-secondary text-muted-foreground hover:text-foreground"
-                              }`}
-                            >
-                              {value}
-                            </button>
-                          </div>
-                        );
-                      })}
+                                onMouseLeave={() => setHintKey(null)}
+                                onClick={() => {
+                                  if (!isAvailable) {
+                                    setHintKey(key);
+                                    return;
+                                  }
+                                  handleSelect(group.slug, value);
+                                }}
+                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                                  !isAvailable
+                                    ? "bg-secondary/40 text-muted-foreground/30 cursor-not-allowed"
+                                    : selected[group.slug] === value
+                                      ? "bg-foreground text-background"
+                                      : "bg-secondary text-muted-foreground hover:text-foreground"
+                                }`}
+                              >
+                                {value}
+                              </button>
+                            </div>
+                          );
+                        })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
               {matchedVariant && (
                 <p className="text-xs text-muted-foreground/50">
                   کد محصول: {matchedVariant.sku}

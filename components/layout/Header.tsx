@@ -25,6 +25,7 @@ import { toast } from "sonner";
 
 const navLinks = [
   { label: "محصولات", path: "/products" },
+  { label: "لیست قیمت", path: "/price-list" },
   { label: "نمونه‌ها", path: "/gallery" },
   { label: "کیفیت تولید", path: "/quality" },
   { label: "درباره ما", path: "/about" },
