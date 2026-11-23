@@ -221,6 +221,16 @@ export default function Footer() {
                 </Link>
               ))}
             </div>
+
+            <div
+              dangerouslySetInnerHTML={{
+                __html: `
+              <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=8866059&Code=CgWKUsMjfwgw9ukwhtSPMTjAIot0N1FZ'>
+                <img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=8866059&Code=CgWKUsMjfwgw9ukwhtSPMTjAIot0N1FZ' alt='' style='cursor:pointer' code='CgWKUsMjfwgw9ukwhtSPMTjAIot0N1FZ'>
+              </a>
+              `,
+              }}
+            />
           </div>
         </div>
 
