@@ -121,3 +121,30 @@ h5,
 h6 {
   font-family: var(--font-heading);
 }
+
+/* نوار اعلان بالای سایت */
+@keyframes announcement-marquee-rtl {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+@keyframes announcement-marquee-ltr {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.announcement-marquee-rtl,
+.announcement-marquee-ltr {
+  animation-duration: var(--marquee-duration, 60s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.announcement-marquee-rtl { animation-name: announcement-marquee-rtl; }
+.announcement-marquee-ltr { animation-name: announcement-marquee-ltr; }
+/* با رفتن ماوس روی نوار، حرکت متوقف می‌شود */
+.group:hover .announcement-marquee-rtl,
+.group:hover .announcement-marquee-ltr {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .announcement-marquee-rtl,
+  .announcement-marquee-ltr { animation: none; }
+}

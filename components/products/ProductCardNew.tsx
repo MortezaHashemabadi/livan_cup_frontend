@@ -1,4 +1,5 @@
 "use client";
+import LazyImage from "@/components/ui/lazy-image";
 import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
@@ -22,7 +23,7 @@ export default function ProductCardNew({ item }: { item: ProductCardData }) {
         <div className="rounded-3xl bg-cream overflow-hidden mb-4 aspect-square relative">
           {item.primary_image ? (
             <>
-              <img
+              <LazyImage
                 src={item.primary_image}
                 alt={item.name}
                 className={`w-full h-full object-cover transition-opacity duration-500 ${
@@ -32,9 +33,11 @@ export default function ProductCardNew({ item }: { item: ProductCardData }) {
                 }`}
               />
               {item.hover_image && (
-                <img
+                <LazyImage
                   src={item.hover_image}
                   alt={item.name}
+                  skeleton={false}
+                  fade={false}
                   className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 />
               )}

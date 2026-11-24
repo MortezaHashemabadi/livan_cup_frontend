@@ -13,9 +13,6 @@ import AuthModal from "@/components/auth/AuthModal";
 export const metadata: Metadata = {
   title: "بگ کاپ",
   description: "فروش آنلاین لیوان کاغذی و بگ پارچه ای",
-  icons: {
-    icon: "/icon.png",
-  },
 };
 
 export default function RootLayout({
@@ -31,7 +28,7 @@ export default function RootLayout({
             <AuthModalProvider>
               <CartProvider>
                 <Header />
-                <main className="flex-1 pt-20 mb-24">{children}</main>
+                <main className="flex-1 pt-[116px] mb-24">{children}</main>
                 <Footer />
                 <CartDrawer />
                 <AuthModal />

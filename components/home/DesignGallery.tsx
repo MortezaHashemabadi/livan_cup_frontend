@@ -1,4 +1,5 @@
 "use client";
+import LazyImage from "@/components/ui/lazy-image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowLeft, ImageIcon } from "lucide-react";
@@ -61,7 +62,7 @@ export default function DesignGallery() {
                 transition={{ delay: i * 0.07 }}
                 className="group relative rounded-3xl overflow-hidden aspect-[3/4] bg-cream"
               >
-                <img
+                <LazyImage
                   src={item.image}
                   alt={item.title || "طرح گالری"}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

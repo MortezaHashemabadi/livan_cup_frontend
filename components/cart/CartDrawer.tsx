@@ -1,4 +1,5 @@
 "use client";
+import LazyImage from "@/components/ui/lazy-image";
 import Link from "next/link";
 import { X, Plus, Minus, ShoppingBag, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -71,9 +72,9 @@ export default function CartDrawer() {
                     const image = getVariantImage(item.variant_detail);
                     return (
                       <div key={item.id} className="flex gap-4">
-                        <div className="w-20 h-20 rounded-2xl bg-cream overflow-hidden flex-shrink-0">
+                        <div className="relative w-20 h-20 rounded-2xl bg-cream overflow-hidden flex-shrink-0">
                           {image ? (
-                            <img
+                            <LazyImage
                               src={`${NEXT_PUBLIC_MEDIA_URL}${image}`}
                               alt={item.product_name}
                               className="w-full h-full object-cover"

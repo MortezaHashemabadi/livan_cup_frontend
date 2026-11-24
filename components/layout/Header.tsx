@@ -22,6 +22,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { useAuthModal } from "@/lib/auth-modal-context";
 import { toast } from "sonner";
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
+import MegaMenu from "@/components/layout/MegaMenu";
+import { useCategories } from "@/lib/hooks/use-catalog";
 
 const navLinks = [
   { label: "محصولات", path: "/products" },
@@ -42,12 +45,24 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [megaOpen, setMegaOpen] = useState(false);
+  const megaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
   const profileRef = useRef<HTMLDivElement>(null);
   const { totalItems, setIsOpen } = useCart();
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, user, logout } = useAuth();
   const { openAuthModal } = useAuthModal();
+
+  const openMega = () => {
+    if (megaTimer.current) clearTimeout(megaTimer.current);
+    setMegaOpen(true);
+  };
+  const closeMega = () => {
+    if (megaTimer.current) clearTimeout(megaTimer.current);
+    megaTimer.current = setTimeout(() => setMegaOpen(false), 120);
+  };
 
   const handleLogout = () => {
     setProfileOpen(false);
@@ -72,17 +87,38 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => setMobileOpen(false), [pathname]);
+  useEffect(() => {
+    setMobileOpen(false);
+    setMegaOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMegaOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
+          megaOpen
+            ? "bg-white"
+            : scrolled
             ? "bg-white/80 backdrop-blur-xl shadow-[0_1px_0_0_rgba(0,0,0,0.04)]"
             : "bg-transparent"
         }`}
       >
+        {/* نوار اعلان: با اسکرول جمع می‌شود تا هدر کوچک بماند */}
+        <div
+          className={`overflow-hidden transition-[max-height] duration-300 ${
+            scrolled ? "max-h-0" : "max-h-9"
+          }`}
+        >
+          <AnnouncementBar />
+        </div>
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center group ">
@@ -94,20 +130,59 @@ export default function Header() {
               </span>
             </Link>
 
-            <nav className="hidden lg:flex items-center gap-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  href={link.path}
-                  className={`px-4 py-2 rounded-full text-[15px] font-medium transition-all duration-300 ${
-                    pathname === link.path
-                      ? "bg-foreground text-background"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+            <nav className="hidden lg:flex h-full items-center gap-1">
+              {navLinks.map((link) => {
+                const linkClass = `px-4 py-2 rounded-full text-[15px] font-medium transition-all duration-300 ${
+                  pathname === link.path
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                }`;
+
+                if (link.path === "/products") {
+                  return (
+                    <div
+                      key={link.path}
+                      className="flex h-full items-center"
+                      onMouseEnter={openMega}
+                      onMouseLeave={closeMega}
+                      onFocus={openMega}
+                      onBlur={(e) => {
+                        if (!e.currentTarget.contains(e.relatedTarget as Node))
+                          setMegaOpen(false);
+                      }}
+                    >
+                      <Link
+                        href={link.path}
+                        className={`${linkClass} flex items-center gap-1`}
+                        aria-expanded={megaOpen}
+                        aria-haspopup="true"
+                      >
+                        {link.label}
+                        <ChevronDown
+                          className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                            megaOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </Link>
+                      <AnimatePresence>
+                        {megaOpen && (categoriesLoading || categories.length > 0) && (
+                          <MegaMenu
+                            categories={categories}
+                            loading={categoriesLoading}
+                            onNavigate={() => setMegaOpen(false)}
+                          />
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                }
+
+                return (
+                  <Link key={link.path} href={link.path} className={linkClass}>
+                    {link.label}
+                  </Link>
+                );
+              })}
             </nav>
 
             <div className="flex items-center gap-3">

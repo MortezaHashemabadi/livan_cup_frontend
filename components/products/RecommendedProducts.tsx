@@ -1,4 +1,5 @@
 "use client";
+import LazyImage from "@/components/ui/lazy-image";
 import Link from "next/link";
 import { ArrowUpLeft, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
@@ -44,7 +45,7 @@ export default function RecommendedProducts({
               >
                 <div className="rounded-2xl bg-cream overflow-hidden aspect-square mb-3 relative">
                   {image ? (
-                    <img
+                    <LazyImage
                       src={`${NEXT_PUBLIC_MEDIA_URL}${image}`}
                       alt={variant.product_name}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

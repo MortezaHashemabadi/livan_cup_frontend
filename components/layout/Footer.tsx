@@ -166,7 +166,7 @@ export default function Footer() {
             <ul className="space-y-4">
               {contactInfo.map(({ icon: Icon, text }) => (
                 <li
-                  key={text}
+                  key={Icon.name + text}
                   className="flex items-start gap-3 text-sm text-background/50"
                 >
                   <Icon
