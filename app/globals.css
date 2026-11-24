@@ -148,3 +148,24 @@ h6 {
   .announcement-marquee-rtl,
   .announcement-marquee-ltr { animation: none; }
 }
+
+.lazy-skeleton {
+  background: hsl(0 0% 93%);
+  overflow: hidden;
+}
+.lazy-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.8) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: lazy-shimmer 1.4s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lazy-skeleton::after { animation: none; }
+}
