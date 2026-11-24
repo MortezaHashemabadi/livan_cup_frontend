@@ -11,26 +11,38 @@ interface Props {
   onNavigate: () => void;
 }
 
+// حداکثر تعداد ستون دسته‌ها کنار هم (بیشتر از این می‌رود ردیف بعدی)
+const MAX_COLUMNS = 3;
+
 /**
- * مگا منوی «محصولات».
- * دسته‌های اصلی (parent === null) ستون‌ها هستند و زیرمجموعه‌هاشان لینک‌های داخل ستون.
- * اگر دسته‌ای زیرمجموعه نداشت، خودش به‌صورت لینک نمایش داده می‌شود.
+ * مگا منوی «محصولات» — عرضش فقط به اندازه‌ی محتوای داخلش است
+ * و زیر لینک «محصولات» باز می‌شود (والدش باید `relative` باشد).
  */
 export default function MegaMenu({ categories, loading, onNavigate }: Props) {
   const roots = categories.filter((c) => c.parent === null);
   const childrenOf = (id: number) => categories.filter((c) => c.parent === id);
+  const columns = loading
+    ? 3
+    : Math.min(Math.max(roots.length, 1), MAX_COLUMNS);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-      className="absolute inset-x-0 top-full z-50 bg-white border-t border-border/50 shadow-[0_24px_40px_-12px_rgba(0,0,0,0.12)] rounded-b-[32px]"
-    >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8 grid grid-cols-[1fr_280px] gap-10">
+    // pt-2: فاصله‌ی بین هدر و کارت که هاور رو قطع نکنه
+    <div className="absolute right-0 top-full z-50 pt-2">
+      <motion.div
+        initial={{ opacity: 0, y: -8, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -8, scale: 0.98 }}
+        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+        style={{ transformOrigin: "top right" }}
+        className="w-max max-w-[calc(100vw-3rem)] rounded-3xl bg-white border border-border/50 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.18)] p-6 flex gap-8"
+      >
         {/* ستون‌های دسته‌بندی */}
-        <div className="grid grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-6 content-start">
+        <div
+          className="grid gap-x-10 gap-y-6 content-start"
+          style={{
+            gridTemplateColumns: `repeat(${columns}, minmax(130px, auto))`,
+          }}
+        >
           {loading
             ? [1, 2, 3].map((i) => (
                 <div key={i} className="space-y-3">
@@ -46,7 +58,7 @@ export default function MegaMenu({ categories, loading, onNavigate }: Props) {
                     <Link
                       href={`/products?category=${root.slug}`}
                       onClick={onNavigate}
-                      className="font-display font-bold text-[15px] text-foreground hover:text-cobalt transition-colors"
+                      className="font-display font-bold text-[15px] text-foreground hover:text-cobalt transition-colors whitespace-nowrap"
                     >
                       {root.name}
                     </Link>
@@ -57,7 +69,7 @@ export default function MegaMenu({ categories, loading, onNavigate }: Props) {
                             <Link
                               href={`/products?category=${kid.slug}`}
                               onClick={onNavigate}
-                              className="block py-1 text-sm text-muted-foreground hover:text-foreground hover:translate-x-[-2px] transition-all"
+                              className="block py-1 text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
                             >
                               {kid.name}
                             </Link>
@@ -71,28 +83,30 @@ export default function MegaMenu({ categories, loading, onNavigate }: Props) {
         </div>
 
         {/* کارت تبلیغاتی / میانبر */}
-        <div className="flex flex-col gap-3">
+        <div className="flex w-56 shrink-0 flex-col gap-3 border-s border-border/50 ps-8">
           <Link
             href="/designer"
             onClick={onNavigate}
-            className="rounded-3xl bg-soft-blue/40 p-6 hover:bg-soft-blue/60 transition-colors"
+            className="rounded-2xl bg-soft-blue/40 p-5 hover:bg-soft-blue/60 transition-colors"
           >
-            <Sparkles className="w-6 h-6 text-cobalt mb-3" />
-            <p className="font-display font-bold mb-1">طراحی لیوان اختصاصی</p>
-            <p className="text-sm text-muted-foreground">
+            <Sparkles className="w-5 h-5 text-cobalt mb-2" />
+            <p className="font-display font-bold text-sm mb-1">
+              طراحی لیوان اختصاصی
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
               طرح خودت رو با کمک هوش مصنوعی بساز
             </p>
           </Link>
           <Link
             href="/products"
             onClick={onNavigate}
-            className="flex items-center justify-between rounded-2xl bg-secondary px-5 py-3.5 text-sm font-medium hover:bg-secondary/70 transition-colors"
+            className="flex items-center justify-between rounded-xl bg-secondary px-4 py-3 text-sm font-medium hover:bg-secondary/70 transition-colors"
           >
-            مشاهده‌ی همه‌ی محصولات
+            همه‌ی محصولات
             <ArrowUpLeft className="w-4 h-4" />
           </Link>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
