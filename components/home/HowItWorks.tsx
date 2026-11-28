@@ -59,7 +59,7 @@ export default function HowItWorks() {
         <div className="grid md:grid-cols-4 gap-8 items-center">
           {steps.map((step, i) => (
             <motion.div
-              key={step.title}
+              key={step.title ?? i}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

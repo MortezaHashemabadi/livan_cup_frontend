@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { resolveMediaUrl } from "@/lib/media";
 import { Skeleton } from "@/components/ui/skeleton";
 import StatCard from "@/components/dashboard/StatCard";
 import OrderStatusBadge from "@/components/dashboard/OrderStatusBadge";
@@ -194,7 +195,7 @@ export default function DashboardHome() {
                 >
                   {design.thumbnail ? (
                     <img
-                      src={design.thumbnail ?? undefined}
+                      src={resolveMediaUrl(design.thumbnail)}
                       alt={design.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />

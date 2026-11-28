@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cartApi } from "../api/endpoints/cart";
+import { getDefaultOptionChoiceIds } from "../api/endpoints/catalog";
+import { getApiErrorMessage } from "../api/errors";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Order } from "../api/endpoints/orders";
@@ -14,16 +16,23 @@ export function useReorder() {
   const reorder = async (order: Order) => {
     setLoadingOrderId(order.id);
     try {
-      await Promise.all(
-        order.items.map((item) =>
-          cartApi.addItem({
-            variant: item.variant,
-            design: item.design ?? undefined,
-            quantity: item.quantity,
-          }),
-        ),
-      );
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      // یکی‌یکی اضافه می‌کنیم تا سبد هم‌زمان ساخته/ادغام نشود
+      for (const item of order.items) {
+        // سفارش‌های قدیمی آپشن ذخیره‌شده ندارند؛ برای آن‌ها گزینه‌های پیش‌فرض
+        const choiceIds = item.selected_options?.length
+          ? item.selected_options.map((o) => o.choice_id)
+          : getDefaultOptionChoiceIds(item.variant_detail);
+        await cartApi.addItem({
+          variant: item.variant,
+          design: item.design ?? undefined,
+          quantity: item.quantity,
+          selected_option_ids: choiceIds,
+          fabric_color: item.fabric_color || undefined,
+          print_color: item.print_color || undefined,
+          top_color: item.top_color || undefined,
+          bottom_color: item.bottom_color || undefined,
+        });
+      }
 
       sessionStorage.setItem("reorder_notes", order.notes || "");
 
@@ -37,9 +46,10 @@ export function useReorder() {
       }
 
       router.push("/checkout?reorder=1");
-    } catch {
-      toast.error("سفارش مجدد ناموفق بود");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "سفارش مجدد ناموفق بود"));
     } finally {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
       setLoadingOrderId(null);
     }
   };

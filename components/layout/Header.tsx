@@ -49,7 +49,7 @@ export default function Header() {
   const megaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
   const profileRef = useRef<HTMLDivElement>(null);
-  const { totalItems, setIsOpen } = useCart();
+  const { itemCount, setIsOpen } = useCart();
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, user, logout } = useAuth();
@@ -197,13 +197,13 @@ export default function Header() {
                 aria-label="سبد خرید"
               >
                 <ShoppingBag className="w-5 h-5" />
-                {totalItems > 0 && (
+                {itemCount > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     className="absolute -top-0.5 -left-0.5 w-5 h-5 bg-cobalt text-white text-[11px] font-bold rounded-full flex items-center justify-center"
                   >
-                    {totalItems}
+                    {itemCount}
                   </motion.span>
                 )}
               </button>

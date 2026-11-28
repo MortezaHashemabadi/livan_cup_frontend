@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useAuthModal } from "@/lib/auth-modal-context";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
+import { toLatinDigits } from "@/lib/utils";
+import { getApiErrorMessage } from "@/lib/api/errors";
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 120;
@@ -40,15 +42,14 @@ function OtpInput({
   };
 
   const handleInput = (i: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const char = e.target.value.replace(/\D/g, "").slice(-1);
+    const char = toLatinDigits(e.target.value).replace(/\D/g, "").slice(-1);
     if (!char) return;
     onChange(digits.map((d, j) => (j === i ? char : d)).join(""));
     if (i < OTP_LENGTH - 1) focus(i + 1);
   };
 
   const handlePaste = (e: React.ClipboardEvent) => {
-    const pasted = e.clipboardData
-      .getData("text")
+    const pasted = toLatinDigits(e.clipboardData.getData("text"))
       .replace(/\D/g, "")
       .slice(0, OTP_LENGTH);
     if (pasted) {
@@ -146,6 +147,9 @@ export default function AuthModal() {
     setTimeout(reset, 400);
   };
 
+  // شماره بدون فاصله و خط تیره به بک‌اند می‌رود
+  const cleanPhone = phone.replace(/\D/g, "");
+
   const handleSendOtp = async () => {
     if (!phone.trim()) {
       setError("لطفاً شماره موبایل خود را وارد کنید");
@@ -154,14 +158,16 @@ export default function AuthModal() {
     setError("");
     setLoading(true);
     try {
-      await sendOtp(phone);
+      await sendOtp(cleanPhone);
       toast.info("کد ارسال شد", {
         description: `کد تأیید به ${phone} ارسال شد`,
       });
       setStep("otp");
       setCanResend(false);
-    } catch {
-      setError("مشکلی پیش آمد. لطفاً دوباره تلاش کنید.");
+    } catch (error) {
+      setError(
+        getApiErrorMessage(error, "مشکلی پیش آمد. لطفاً دوباره تلاش کنید."),
+      );
     }
     setLoading(false);
   };
@@ -174,25 +180,31 @@ export default function AuthModal() {
     setError("");
     setLoading(true);
     try {
-      await verifyOtp(phone, otp);
+      await verifyOtp(cleanPhone, otp);
       setStep("success");
       toast.success("خوش آمدید!", { description: "با موفقیت وارد شدید." });
       setTimeout(handleClose, 1800);
-    } catch {
-      setError("کد نامعتبر است. لطفاً دوباره تلاش کنید.");
+    } catch (error) {
+      // پیام بک‌اند (مثلاً «کد نامعتبر یا منقضی شده است») یا محدودیت تعداد درخواست
+      setError(
+        getApiErrorMessage(error, "تأیید کد ناموفق بود. لطفاً دوباره تلاش کنید."),
+      );
     }
     setLoading(false);
   };
 
   const handleResend = async () => {
-    setCanResend(false);
-    setResendKey((k) => k + 1);
     setError("");
     setOtp("");
     try {
-      await sendOtp(phone);
+      await sendOtp(cleanPhone);
+      // شمارش معکوس فقط بعد از ارسال موفق دوباره شروع می‌شود
+      setCanResend(false);
+      setResendKey((k) => k + 1);
       toast.info("کد مجدد ارسال شد", { description: "کد جدید در راه است." });
-    } catch {}
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "ارسال مجدد کد ناموفق بود"));
+    }
   };
 
   return (
@@ -314,7 +326,9 @@ export default function AuthModal() {
                       type="tel"
                       value={phone}
                       onChange={(e) => {
-                        setPhone(e.target.value.replace(/[^\d\s\-()]/g, ""));
+                        setPhone(
+                          toLatinDigits(e.target.value).replace(/[^\d\s\-()]/g, ""),
+                        );
                         setError("");
                       }}
                       onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}

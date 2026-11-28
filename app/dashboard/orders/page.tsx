@@ -9,6 +9,7 @@ import { getVariantImage } from "@/lib/api/endpoints/catalog";
 import type { OrderStatus } from "@/lib/api/endpoints/orders";
 import { RotateCcw, Loader2 } from "lucide-react";
 import { useReorder } from "@/lib/hooks/use-reorder";
+import { formatItemSpecs } from "@/lib/cart-format";
 
 const NEXT_PUBLIC_MEDIA_URL =
   process.env.NEXT_PUBLIC_MEDIA_URL ?? "http://127.0.0.1:8000";
@@ -169,6 +170,11 @@ export default function DashboardOrders() {
                               <p className="text-sm font-medium">
                                 {item.product_name}
                               </p>
+                              {formatItemSpecs(item).length > 0 && (
+                                <p className="text-xs text-muted-foreground/70">
+                                  {formatItemSpecs(item).join(" · ")}
+                                </p>
+                              )}
                               <p className="text-xs text-muted-foreground">
                                 {item.quantity.toLocaleString("fa-IR")} عدد ·{" "}
                                 {parseFloat(item.unit_price).toLocaleString(

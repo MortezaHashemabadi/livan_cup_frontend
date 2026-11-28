@@ -5,16 +5,16 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { resolveMediaUrl } from "@/lib/media";
 import {
   useDesigns,
   useDeleteDesign,
   useDuplicateDesign,
 } from "@/lib/hooks/use-designs";
 
-
 export default function DashboardDesigns() {
   const { data: designs = [], isLoading } = useDesigns();
-  
+
   const deleteDesign = useDeleteDesign();
   const duplicateDesign = useDuplicateDesign();
 
@@ -35,7 +35,6 @@ export default function DashboardDesigns() {
       toast.error("حذف طرح ناموفق بود");
     }
   };
-  console.log(designs);
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between">
@@ -92,7 +91,7 @@ export default function DashboardDesigns() {
               <div className="relative aspect-square bg-cream overflow-hidden">
                 {design.thumbnail ? (
                   <img
-                    src={design.thumbnail ?? undefined}
+                    src={resolveMediaUrl(design.thumbnail)}
                     alt={design.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />

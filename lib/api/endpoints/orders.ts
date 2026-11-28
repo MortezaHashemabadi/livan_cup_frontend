@@ -1,5 +1,6 @@
 import { api } from "../client";
 import type { Variant } from "./catalog";
+import type { SelectedOption } from "./cart";
 
 export interface OrderItem {
   id: number;
@@ -12,6 +13,11 @@ export interface OrderItem {
   quantity: number;
   unit_price: string;
   subtotal: string;
+  selected_options: SelectedOption[];
+  fabric_color: string;
+  print_color: string;
+  top_color: string;
+  bottom_color: string;
 }
 export type OrderStatus =
   | "pending"

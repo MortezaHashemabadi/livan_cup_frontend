@@ -1,10 +1,12 @@
 "use client";
 import LazyImage from "@/components/ui/lazy-image";
 import Link from "next/link";
-import { X, Plus, Minus, ShoppingBag, ArrowLeft } from "lucide-react";
+import { X, ShoppingBag, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart-context";
 import { getVariantImage } from "@/lib/api/endpoints/catalog";
+import { formatItemSpecs } from "@/lib/cart-format";
+import QuantityInput from "@/components/products/QuantityInput";
 import { motion, AnimatePresence } from "framer-motion";
 
 const NEXT_PUBLIC_MEDIA_URL =
@@ -70,6 +72,8 @@ export default function CartDrawer() {
                 <div className="space-y-6">
                   {items.map((item) => {
                     const image = getVariantImage(item.variant_detail);
+                    const specs = formatItemSpecs(item);
+                    const min = item.min_quantity ?? 1;
                     return (
                       <div key={item.id} className="flex gap-4">
                         <div className="relative w-20 h-20 rounded-2xl bg-cream overflow-hidden flex-shrink-0">
@@ -94,32 +98,30 @@ export default function CartDrawer() {
                               .map((av) => av.value)
                               .join(" · ")}
                           </p>
+                          {specs.length > 0 && (
+                            <p className="text-xs text-muted-foreground/70 mt-0.5">
+                              {specs.join(" · ")}
+                            </p>
+                          )}
                           <p className="text-sm text-muted-foreground mt-1">
                             {item.unit_price !== null
                               ? `${item.unit_price.toLocaleString("fa-IR")} تومان هر عدد`
                               : "—"}
                           </p>
-                          <div className="flex items-center gap-3 mt-3">
-                            <button
-                              onClick={() =>
-                                updateQuantity(item.id, item.quantity - 1)
-                              }
-                              className="w-7 h-7 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
-                            >
-                              <Minus className="w-3 h-3" />
-                            </button>
-                            <span className="text-sm font-medium w-10 text-center">
-                              {item.quantity.toLocaleString("fa-IR")}
-                            </span>
-                            <button
-                              onClick={() =>
-                                updateQuantity(item.id, item.quantity + 1)
-                              }
-                              className="w-7 h-7 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
-                            >
-                              <Plus className="w-3 h-3" />
-                            </button>
+                          <div className="mt-3">
+                            <QuantityInput
+                              size="sm"
+                              value={item.quantity}
+                              min={min}
+                              step={min >= 50 ? 50 : 1}
+                              onChange={(q) => updateQuantity(item.id, q)}
+                            />
                           </div>
+                          {item.error && (
+                            <p className="text-xs text-destructive mt-2">
+                              {item.error}
+                            </p>
+                          )}
                         </div>
                         <div className="flex flex-col items-end justify-between">
                           <button
@@ -161,12 +163,21 @@ export default function CartDrawer() {
                     {cart.total.toLocaleString("fa-IR")} تومان
                   </span>
                 </div>
-                <Link href="/checkout" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full bg-cobalt hover:bg-cobalt-hover text-white rounded-full h-12 font-medium">
-                    ادامه‌ی فرآیند خرید
-                    <ArrowLeft className="w-4 h-4 mr-2" />
+                {cart.can_checkout === false ? (
+                  <Button
+                    disabled
+                    className="w-full bg-cobalt text-white rounded-full h-12 font-medium"
+                  >
+                    ابتدا مشکل آیتم‌های سبد را برطرف کنید
                   </Button>
-                </Link>
+                ) : (
+                  <Link href="/checkout" onClick={() => setIsOpen(false)}>
+                    <Button className="w-full bg-cobalt hover:bg-cobalt-hover text-white rounded-full h-12 font-medium">
+                      ادامه‌ی فرآیند خرید
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                    </Button>
+                  </Link>
+                )}
               </div>
             )}
           </motion.div>

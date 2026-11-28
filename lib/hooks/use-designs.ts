@@ -1,6 +1,7 @@
 "use client";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { designsApi, type Design } from "../api/endpoints/designs";
+import { resolveMediaUrl } from "../media";
 
 export function useDesigns() {
   return useQuery({ queryKey: ["designs"], queryFn: designsApi.list });
@@ -14,9 +15,6 @@ export function useDeleteDesign() {
   });
 }
 
-const NEXT_PUBLIC_MEDIA_URL =
-  process.env.NEXT_PUBLIC_MEDIA_URL ?? "http://127.0.0.1:8000";
-
 export function useDuplicateDesign() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -24,10 +22,13 @@ export function useDuplicateDesign() {
       const formData = new FormData();
       formData.append("name", `${design.name} (کپی)`);
       formData.append("design_data", JSON.stringify(design.design_data));
-      if (design.thumbnail) {
-        const res = await fetch(`${NEXT_PUBLIC_MEDIA_URL}${design.thumbnail}`);
-        const blob = await res.blob();
-        formData.append("thumbnail", blob, "thumbnail.png");
+      // بک‌اند آدرس مطلق می‌دهد؛ resolveMediaUrl هر دو حالت را درست می‌کند
+      const thumbnailUrl = resolveMediaUrl(design.thumbnail);
+      if (thumbnailUrl) {
+        const res = await fetch(thumbnailUrl);
+        if (res.ok) {
+          formData.append("thumbnail", await res.blob(), "thumbnail.png");
+        }
       }
       return designsApi.create(formData);
     },

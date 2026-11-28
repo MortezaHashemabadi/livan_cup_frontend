@@ -5,10 +5,13 @@ import { cartApi, type Cart } from "./api/endpoints/cart";
 import { useAuth } from "./auth-context";
 import { useAuthModal } from "./auth-modal-context";
 import { toast } from "sonner";
+import { getApiErrorMessage } from "./api/errors";
 
 interface CartContextValue {
   cart: Cart | undefined;
   totalItems: number;
+  /** تعداد ردیف‌های سبد (برای نشانگر هدر؛ جمع تعداد در سفارش عمده بزرگ می‌شود) */
+  itemCount: number;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   addItem: (
@@ -19,6 +22,8 @@ interface CartContextValue {
     selectedOptionIds?: number[],
     fabricColor?: string,
     printColor?: string,
+    topColor?: string,
+    bottomColor?: string,
   ) => Promise<void>;
   updateQuantity: (itemId: number, quantity: number) => void;
   removeItem: (itemId: number) => void;
@@ -47,26 +52,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       invalidate();
       toast.success("به سبد اضافه شد");
     },
-    onError: () => toast.error("افزودن به سبد ناموفق بود"),
+    onError: (error) =>
+      toast.error(getApiErrorMessage(error, "افزودن به سبد ناموفق بود")),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, quantity }: { id: number; quantity: number }) =>
       cartApi.updateItem(id, { quantity }),
     onSuccess: invalidate,
-    onError: (error) => {
-      console.error("Update Error:", error); // این خط را اضافه کنید
-      toast.error("بروزرسانی تعداد ناموفق بود");
-    },
+    onError: (error) =>
+      toast.error(getApiErrorMessage(error, "بروزرسانی تعداد ناموفق بود")),
   });
 
   const removeMutation = useMutation({
     mutationFn: (id: number) => cartApi.removeItem(id),
     onSuccess: invalidate,
-    onError: (error) => {
-      console.error("Remove Error:", error); // این خط را اضافه کنید
-      toast.error("حذف آیتم ناموفق بود");
-    },
+    onError: (error) =>
+      toast.error(getApiErrorMessage(error, "حذف آیتم ناموفق بود")),
   });
 
   const addItem = async (
@@ -77,6 +79,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     selectedOptionIds?: number[],
     fabricColor?: string,
     printColor?: string,
+    topColor?: string,
+    bottomColor?: string,
   ) => {
     if (!isAuthenticated) {
       openAuthModal();
@@ -90,6 +94,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       selected_option_ids: selectedOptionIds,
       fabric_color: fabricColor,
       print_color: printColor,
+      top_color: topColor,
+      bottom_color: bottomColor,
     });
   };
 
@@ -101,12 +107,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const removeItem = (itemId: number) => removeMutation.mutate(itemId);
 
   const totalItems = cart?.items.reduce((sum, i) => sum + i.quantity, 0) ?? 0;
+  const itemCount = cart?.items.length ?? 0;
 
   return (
     <CartContext.Provider
       value={{
         cart,
         totalItems,
+        itemCount,
         isOpen,
         setIsOpen,
         addItem,

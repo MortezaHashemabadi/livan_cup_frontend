@@ -264,6 +264,32 @@ export function findVariant(
   });
 }
 
+/** حداقل تیراژ سفارش = کوچک‌ترین min_quantity بین پله‌های قیمت. */
+export function getMinQuantity(
+  variant: Pick<Variant, "price_tiers">,
+): number | null {
+  return variant.price_tiers.length
+    ? Math.min(...variant.price_tiers.map((t) => t.min_quantity))
+    : null;
+}
+
+/** گزینه‌ی پیش‌فرض یک گروه آپشن (برای دستگیره: پانچ). */
+export function getDefaultChoiceId(group: OptionGroup): number | undefined {
+  if (group.name === "نوع دستگیره") {
+    const punch = group.choices.find((c) => c.name === "پانچ");
+    if (punch) return punch.id;
+  }
+  return group.choices.find((c) => c.is_default)?.id;
+}
+
+export function getDefaultOptionChoiceIds(
+  variant: Pick<Variant, "option_groups">,
+): number[] {
+  return variant.option_groups
+    .map(getDefaultChoiceId)
+    .filter((id): id is number => id !== undefined);
+}
+
 export function getUnitPrice(variant: Variant, qty: number): number | null {
   const tier = variant.price_tiers.find(
     (t) =>

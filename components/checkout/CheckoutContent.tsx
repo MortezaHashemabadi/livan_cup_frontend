@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { Fragment, useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,6 +23,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { ticketsApi } from "@/lib/api/endpoints/tickets";
 import { useAuth } from "@/lib/auth-context";
+import { getApiErrorMessage } from "@/lib/api/errors";
+import { formatItemSpecs } from "@/lib/cart-format";
 
 const NEXT_PUBLIC_MEDIA_URL =
   process.env.NEXT_PUBLIC_MEDIA_URL ?? "http://127.0.0.1:8000";
@@ -35,23 +37,25 @@ const steps = [
 
 export default function CheckoutContent() {
   const searchParams = useSearchParams();
-  const { cart } = useCart();
+  const { cart, setIsOpen } = useCart();
   const items = cart?.items ?? [];
   const { user } = useAuth();
   const isReorder = searchParams.get("reorder") === "1";
   const [step, setStep] = useState(() => {
-    if (!isReorder) return 1;
+    if (!isReorder || typeof window === "undefined") return 1;
     return Number(sessionStorage.getItem("reorder_step")) || 1;
   });
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
     () => {
-      if (!isReorder) return null;
+      if (!isReorder || typeof window === "undefined") return null;
       const stored = sessionStorage.getItem("reorder_address_id");
       return stored ? Number(stored) : null;
     },
   );
   const [notes, setNotes] = useState(() =>
-    isReorder ? sessionStorage.getItem("reorder_notes") || "" : "",
+    isReorder && typeof window !== "undefined"
+      ? sessionStorage.getItem("reorder_notes") || ""
+      : "",
   );
 
   useEffect(() => {
@@ -75,9 +79,15 @@ export default function CheckoutContent() {
 
   const queryClient = useQueryClient();
 
+  const hasIssues = cart?.can_checkout === false;
+
   const handleSubmit = async () => {
     if (!selectedAddressId) {
       toast.error("یک آدرس انتخاب کنید");
+      return;
+    }
+    if (hasIssues) {
+      toast.error("ابتدا مشکل آیتم‌های سبد را برطرف کنید");
       return;
     }
     setIsSubmitting(true);
@@ -105,8 +115,10 @@ export default function CheckoutContent() {
 
       setOrderComplete(true);
       toast.success("سفارش با موفقیت ثبت شد!");
-    } catch {
-      toast.error("ثبت سفارش ناموفق بود");
+    } catch (error) {
+      // پیام بک‌اند (مثلاً زیر حداقل سفارش) را مستقیم نشان می‌دهیم
+      toast.error(getApiErrorMessage(error, "ثبت سفارش ناموفق بود"));
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
     } finally {
       setIsSubmitting(false);
     }
@@ -176,11 +188,30 @@ export default function CheckoutContent() {
           تسویه‌حساب
         </h1>
 
+        {hasIssues && cart && (
+          <div className="mb-8 rounded-2xl bg-destructive/10 text-destructive p-4 space-y-1.5">
+            <p className="text-sm font-semibold">
+              برخی آیتم‌های سبد قابل ثبت نیستند:
+            </p>
+            {cart.issues.map((issue) => (
+              <p key={issue.item_id} className="text-xs">
+                {issue.product_name}: {issue.message}
+              </p>
+            ))}
+            <button
+              type="button"
+              onClick={() => setIsOpen(true)}
+              className="text-xs font-medium underline underline-offset-2"
+            >
+              ویرایش سبد خرید
+            </button>
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-12 w-full gap-4">
           {steps.map((s, i) => (
-            <>
+            <Fragment key={s.id}>
               <div
-                key={s.id}
                 className={`flex items-center justify-center gap-2 px-6 h-12 rounded-full text-sm font-medium transition-colors flex-1 ${
                   step >= s.id
                     ? "bg-cobalt text-white"
@@ -193,7 +224,7 @@ export default function CheckoutContent() {
               {i < steps.length - 1 && (
                 <div className="h-0.5 w-16 bg-border rounded-full flex-shrink-0 hidden md:block" />
               )}
-            </>
+            </Fragment>
           ))}
         </div>
 
@@ -220,6 +251,7 @@ export default function CheckoutContent() {
               <div className="space-y-3">
                 {items.map((item) => {
                   const image = getVariantImage(item.variant_detail);
+                  const specs = formatItemSpecs(item);
                   return (
                     <div key={item.id} className="flex items-center gap-4">
                       <div className="w-14 h-14 rounded-xl bg-white overflow-hidden flex-shrink-0">
@@ -239,6 +271,16 @@ export default function CheckoutContent() {
                           {item.quantity.toLocaleString("fa-IR")} عدد ×{" "}
                           {item.unit_price?.toLocaleString("fa-IR")} تومان
                         </p>
+                        {specs.length > 0 && (
+                          <p className="text-xs text-muted-foreground/70 mt-0.5">
+                            {specs.join(" · ")}
+                          </p>
+                        )}
+                        {item.error && (
+                          <p className="text-xs text-destructive mt-0.5">
+                            {item.error}
+                          </p>
+                        )}
                       </div>
                       <span className="text-sm font-medium">
                         {item.subtotal?.toLocaleString("fa-IR")} تومان
@@ -329,7 +371,7 @@ export default function CheckoutContent() {
           ) : (
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || hasIssues}
               className="bg-cobalt hover:bg-cobalt-hover text-white rounded-full gap-2 h-12 px-8 font-medium shadow-none"
             >
               <Package className="w-4 h-4" />

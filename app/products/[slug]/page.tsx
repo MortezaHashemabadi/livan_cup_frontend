@@ -9,8 +9,6 @@ import ReviewsSection from "@/components/products/ReviewsSection";
 import {
   ShoppingBag,
   ArrowLeft,
-  Plus,
-  Minus,
   Sparkles,
   Loader2,
   Check,
@@ -20,6 +18,7 @@ import {
 } from "lucide-react";
 import RecommendedProducts from "@/components/products/RecommendedProducts";
 import ColorPickerInput from "@/components/products/ColorPickerInput";
+import QuantityInput from "@/components/products/QuantityInput";
 import {
   Carousel,
   CarouselContent,
@@ -37,10 +36,13 @@ import {
   findVariant,
   getUnitPrice,
   getVariantImage,
+  getDefaultChoiceId,
+  getMinQuantity,
   type OptionGroup,
 } from "@/lib/api/endpoints/catalog";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
+import { resolveMediaUrl } from "@/lib/media";
 import { useDesigns } from "@/lib/hooks/use-designs";
 import { FolderOpen, Wand2 } from "lucide-react";
 
@@ -104,6 +106,8 @@ export default function ProductDetailPage() {
   >({});
   const [fabricColor, setFabricColor] = useState("تک رنگ روشن");
   const [printColor, setPrintColor] = useState("");
+  const [topColor, setTopColor] = useState("");
+  const [bottomColor, setBottomColor] = useState("");
   const [hintKey, setHintKey] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(100);
   const { data: savedDesigns = [] } = useDesigns();
@@ -132,9 +136,17 @@ export default function ProductDetailPage() {
         initial[av.attribute_slug] = av.value;
       });
       setSelected(initial);
-      setQuantity(chosen.price_tiers[0]?.min_quantity ?? 100);
+      setQuantity(getMinQuantity(chosen) ?? 100);
     }
   }, [product, variantIdFromUrl]);
+
+  // با تغییر ترکیب (سایز/گرماژ/فرم) تعداد هیچ‌وقت زیر حداقل سفارش واریانت جدید نماند
+  useEffect(() => {
+    if (!product) return;
+    const variant = findVariant(product, selected);
+    const min = variant ? getMinQuantity(variant) : null;
+    if (min !== null) setQuantity((q) => (q < min ? min : q));
+  }, [product, selected]);
 
   const handleFileSelect = (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -144,7 +156,6 @@ export default function ProductDetailPage() {
     setUploadedFiles((prev) => [...prev, file]);
     setUploadedPreviews((prev) => [...prev, URL.createObjectURL(file)]);
   };
-
 
   if (isLoading) {
     return (
@@ -179,25 +190,35 @@ export default function ProductDetailPage() {
   const getEffectiveChoiceId = (group: OptionGroup): number | undefined => {
     if (selectedOptions[group.id] !== undefined)
       return selectedOptions[group.id];
-    if (group.name === "نوع دستگیره") {
-      return group.choices.find((c) => c.name === "پانچ")?.id;
-    }
-    return group.choices.find((c) => c.is_default)?.id;
+    return getDefaultChoiceId(group);
   };
   const baseUnitPrice = matchedVariant
     ? getUnitPrice(matchedVariant, quantity)
     : null;
   const optionTotal = matchedVariant
     ? matchedVariant.option_groups.reduce((sum, g) => {
-        const choice = g.choices.find(
-          (c) => c.id === getEffectiveChoiceId(g),
-        );
+        const choice = g.choices.find((c) => c.id === getEffectiveChoiceId(g));
         return sum + (choice ? parseFloat(choice.price_modifier) : 0);
       }, 0)
     : 0;
-  const unitPrice =
-    baseUnitPrice !== null ? baseUnitPrice + optionTotal : null;
+  const unitPrice = baseUnitPrice !== null ? baseUnitPrice + optionTotal : null;
   const totalPrice = unitPrice !== null ? unitPrice * quantity : null;
+
+  const minQuantity = matchedVariant ? getMinQuantity(matchedVariant) : null;
+  const belowMinimum = minQuantity !== null && quantity < minQuantity;
+  const chosenName = (groupName: string) => {
+    const group = matchedVariant?.option_groups.find(
+      (g) => g.name === groupName,
+    );
+    if (!group) return undefined;
+    return group.choices.find((c) => c.id === getEffectiveChoiceId(group))
+      ?.name;
+  };
+  const hasColorCountGroup = !!matchedVariant?.option_groups.some(
+    (g) => g.name === "تعداد رنگ",
+  );
+  const isTwoColor = chosenName("تعداد رنگ") === "دو رنگ";
+  const usesCustomPrintColor = chosenName("رنگ چاپ") === "معمولی";
 
   const variantImages = matchedVariant
     ? [...matchedVariant.images].sort((a, b) => a.order - b.order)
@@ -209,46 +230,72 @@ export default function ProductDetailPage() {
     setSelected(next);
   };
 
-    const handleAddToCart = () => {
-      if (!matchedVariant) return;
-      if (matchedVariant.stock_status !== "in_stock") {
-        toast.error("این ترکیب در حال حاضر موجود نیست");
-        return;
-      }
-      const selectedOptionIds = matchedVariant.option_groups
-        .map((g) => getEffectiveChoiceId(g))
-        .filter((id): id is number => id !== undefined);
-      // اگه چند فایل آپلود شده، برای هر فایل یه آیتم جدا اضافه می‌کنیم
-      if (uploadedFiles.length > 0) {
-        uploadedFiles.forEach((file) => {
-          addItem(
-            matchedVariant.id,
-            quantity,
-            selectedDesignId ?? undefined,
-            file,
-            selectedOptionIds,
-            fabricColor || undefined,
-            printColor || undefined,
-          );
-          if (designMode === "consultation") {
-            sessionStorage.setItem("needs_design_consultation", "1");
-          }
-        });
-      } else {
-        addItem(
+  const handleAddToCart = async () => {
+    if (!matchedVariant) return;
+    if (matchedVariant.stock_status !== "in_stock") {
+      toast.error("این ترکیب در حال حاضر موجود نیست");
+      return;
+    }
+    if (belowMinimum && minQuantity !== null) {
+      toast.error(
+        `حداقل سفارش این محصول ${minQuantity.toLocaleString("fa-IR")} عدد است`,
+      );
+      return;
+    }
+    if (unitPrice === null) {
+      toast.error("برای این تعداد قیمتی ثبت نشده است");
+      return;
+    }
+    if (isTwoColor && (!topColor.trim() || !bottomColor.trim())) {
+      toast.error("رنگ بالا و پایین بگ را مشخص کنید");
+      return;
+    }
+
+    const selectedOptionIds = matchedVariant.option_groups
+      .map((g) => getEffectiveChoiceId(g))
+      .filter((id): id is number => id !== undefined);
+
+    // فقط رنگ‌هایی که برای انتخاب فعلی معنی دارند ارسال می‌شوند
+    const singleFabricColor =
+      hasColorCountGroup && !isTwoColor
+        ? fabricColor.trim() || undefined
+        : undefined;
+    const top = isTwoColor ? topColor.trim() : undefined;
+    const bottom = isTwoColor ? bottomColor.trim() : undefined;
+    const customPrintColor = usesCustomPrintColor
+      ? printColor.trim() || undefined
+      : undefined;
+
+    // طرح ذخیره‌شده فقط در حالت «طرح‌های ذخیره‌شده» و فایل فقط در حالت «آپلود»
+    const design =
+      designMode === "ai" ? (selectedDesignId ?? undefined) : undefined;
+    const files: (File | undefined)[] =
+      designMode === "upload" && uploadedFiles.length > 0
+        ? uploadedFiles
+        : [undefined];
+
+    try {
+      // برای هر فایل یک آیتم جدا؛ پشت‌سرهم تا سبد هم‌زمان ساخته نشود
+      for (const file of files) {
+        await addItem(
           matchedVariant.id,
           quantity,
-          selectedDesignId ?? undefined,
-          undefined,
+          design,
+          file,
           selectedOptionIds,
-          fabricColor || undefined,
-          printColor || undefined,
+          singleFabricColor,
+          customPrintColor,
+          top,
+          bottom,
         );
-        if (designMode === "consultation") {
-          sessionStorage.setItem("needs_design_consultation", "1");
-        }
       }
-    };
+    } catch {
+      return; // پیام خطا را cart-context نشان داده است
+    }
+    if (designMode === "consultation") {
+      sessionStorage.setItem("needs_design_consultation", "1");
+    }
+  };
 
   return (
     <div className="pt-8 pb-20">
@@ -364,29 +411,28 @@ export default function ProductDetailPage() {
                       : "تعیین نشده"}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 bg-secondary rounded-full p-1">
-                  <button
-                    onClick={() => setQuantity((q) => Math.max(1, q - 50))}
-                    className="w-9 h-9 rounded-full hover:bg-background transition-colors flex items-center justify-center"
-                  >
-                    <Minus className="w-3.5 h-3.5" />
-                  </button>
-                  <span className="font-medium text-sm w-16 text-center">
-                    {quantity.toLocaleString("fa-IR")} عدد
-                  </span>
-                  <button
-                    onClick={() => setQuantity((q) => q + 50)}
-                    className="w-9 h-9 rounded-full hover:bg-background transition-colors flex items-center justify-center"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                <QuantityInput
+                  value={quantity}
+                  min={minQuantity ?? 1}
+                  step={50}
+                  onChange={setQuantity}
+                />
               </div>
+
+              {belowMinimum && minQuantity !== null && (
+                <p className="text-xs text-destructive">
+                  حداقل سفارش این محصول {minQuantity.toLocaleString("fa-IR")}{" "}
+                  عدد است
+                </p>
+              )}
 
               <Button
                 onClick={handleAddToCart}
                 disabled={
-                  !matchedVariant || matchedVariant.stock_status !== "in_stock"
+                  !matchedVariant ||
+                  matchedVariant.stock_status !== "in_stock" ||
+                  belowMinimum ||
+                  unitPrice === null
                 }
                 className={`w-full rounded-full h-14 font-medium text-base shadow-none ${
                   matchedVariant?.stock_status === "coming_soon"
@@ -421,9 +467,6 @@ export default function ProductDetailPage() {
               <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight mb-3">
                 {product.name}
               </h1>
-              <p className="text-muted-foreground leading-relaxed">
-                {product.description}
-              </p>
               <p className="text-muted-foreground leading-relaxed">
                 {product.description}
               </p>
@@ -581,14 +624,41 @@ export default function ProductDetailPage() {
                           >
                             <div>{renderChoices()}</div>
                             <div>
-                              <p className="text-sm font-medium mb-2.5">
-                                رنگ پارچه
-                              </p>
-                              <ColorPickerInput
-                                value={fabricColor}
-                                onChange={setFabricColor}
-                                placeholder="مثلاً سرمه‌ای"
-                              />
+                              {isTwoColor ? (
+                                <div className="space-y-3">
+                                  <div>
+                                    <p className="text-sm font-medium mb-2.5">
+                                      رنگ پارچه بالا
+                                    </p>
+                                    <ColorPickerInput
+                                      value={topColor}
+                                      onChange={setTopColor}
+                                      placeholder="مثلاً مشکی"
+                                    />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium mb-2.5">
+                                      رنگ پارچه پایین
+                                    </p>
+                                    <ColorPickerInput
+                                      value={bottomColor}
+                                      onChange={setBottomColor}
+                                      placeholder="مثلاً سفید"
+                                    />
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <p className="text-sm font-medium mb-2.5">
+                                    رنگ پارچه
+                                  </p>
+                                  <ColorPickerInput
+                                    value={fabricColor}
+                                    onChange={setFabricColor}
+                                    placeholder="مثلاً سرمه‌ای"
+                                  />
+                                </>
+                              )}
                             </div>
                           </div>
                         );
@@ -759,7 +829,7 @@ export default function ProductDetailPage() {
                               >
                                 {design.thumbnail ? (
                                   <img
-                                    src={design.thumbnail}
+                                    src={resolveMediaUrl(design.thumbnail)}
                                     alt={design.name}
                                     className="w-full h-full object-cover"
                                   />
